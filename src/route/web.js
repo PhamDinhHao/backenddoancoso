@@ -1,6 +1,8 @@
 import express from "express";
 import homeController from "../controllers/homeControlller"
 import userController from "../controllers/userController"
+import supplierController from "../controllers/supplierController"
+import customerController from "../controllers/customerController"
 
 let router = express.Router();
 
@@ -22,6 +24,17 @@ let initWebRoutes = (app) => {
     router.post('/api/create-new-user', userController.handleCreateNewUser);
     router.put('/api/edit-user', userController.handleEditUser);
     router.delete('/api/delete-user', userController.handleDeleteUser);
+
+    router.get('/api/get-all-supplier', supplierController.handleGetAllSupplier);
+    router.post('/api/create-new-supplier', supplierController.handleCreateNewSupplier);
+    router.put('/api/edit-supplier', supplierController.handleEditSupplier);
+    router.delete('/api/delete-supplier', supplierController.handleDeleteSupplier);
+
+    router.get('/api/get-all-customer', customerController.handleGetAllCustomer);
+    router.post('/api/create-new-customer', customerController.handleCreateNewCustomer);
+    router.put('/api/edit-customer', customerController.handleEditCustomer);
+    router.delete('/api/delete-customer', customerController.handleDeleteCustomer);
+
 
 
     router.get('/api/allcode', userController.getAllCode);
