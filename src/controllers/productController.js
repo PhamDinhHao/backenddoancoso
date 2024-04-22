@@ -19,8 +19,6 @@ let handleGetAllProduct = async (req, res) => {
 
 let handleCreateNewProduct = async (req, res) => {
   let message = await productService.createNewProduct(req.body);
-  console.log("mes", message);
-
   return res.status(200).json(message);
 };
 
