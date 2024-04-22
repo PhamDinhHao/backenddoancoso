@@ -27,99 +27,101 @@ let getAllProducts = (productId) => {
   });
 };
 
-// let createNewCustomer = (data) => {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       await db.Customer.create({
-//         name: data.name,
-//         phoneNumber: data.phoneNumber,
-//         address: data.address,
-//         email: data.email,
-//         gender: data.gender,
-//         birthday: data.birthday,
-//         debtCustomer: data.debtCustomer,
-//       });
-//       resolve({
-//         errCode: 0,
-//         errMessage: "oke",
-//       });
-//     } catch (error) {
-//       reject(error);
-//     }
-//   });
-// };
-// let deleteCustomer = (customerId) => {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       let customer = await db.Customer.findOne({
-//         where: { id: customerId },
-//         raw: false,
-//       });
-//       if (!customer) {
-//         resolve({
-//           errCode: 2,
-//           errMessage: `The customer isn't exist`,
-//         });
-//       } else {
-//         await customer.destroy();
+let createNewProduct = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await db.Product.create({
+        productName: data.productName,
+        category: data.category,
+        cost: data.cost,
+        sale: data.sale,
+        image: data.image,
+        quantity: data.quantity,
+        description: data.description,
+      });
+      resolve({
+        errCode: 0,
+        errMessage: "oke",
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
-//         // await db.supplier.destroy({
-//         //     where: { id: supplierId },
-//         // })
+let deleteProduct = (productId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let product = await db.Product.findOne({
+        where: { id: productId },
+        raw: false,
+      });
+      if (!product) {
+        resolve({
+          errCode: 2,
+          errMessage: `The product isn't exist`,
+        });
+      } else {
+        await product.destroy();
 
-//         resolve({
-//           errCode: 0,
-//           errMessage: `The customer is delete`,
-//         });
-//       }
-//     } catch (error) {
-//       reject(error);
-//     }
-//   });
-// };
-// let updateCustomerData = (data) => {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       if (!data.id) {
-//         resolve({
-//           errCode: 2,
-//           errMessage: "missing requier parameter",
-//         });
-//       }
-//       let customer = await db.Customer.findOne({
-//         where: { id: data.id },
-//         raw: false,
-//       });
+        // await db.supplier.destroy({
+        //     where: { id: supplierId },
+        // })
 
-//       if (customer) {
-//         customer.name = data.name;
-//         customer.phoneNumber = data.phoneNumber;
-//         customer.address = data.address;
-//         customer.email = data.email;
-//         customer.debtCustomer = data.debtCustomer;
-//         customer.gender = data.gender;
-//         customer.birthday = data.birthday;
-//         await customer.save();
+        resolve({
+          errCode: 0,
+          errMessage: `The product is delete`,
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
-//         resolve({
-//           errCode: 0,
-//           errMessage: "Update the customer succeeds",
-//         });
-//       } else {
-//         resolve({
-//           errCode: 1,
-//           errMessage: "customer not found",
-//         });
-//       }
-//     } catch (error) {
-//       reject(error);
-//     }
-//   });
-// };
+let updateProductData = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!data.id) {
+        resolve({
+          errCode: 2,
+          errMessage: "missing requier parameter",
+        });
+      }
+      let product = await db.Product.findOne({
+        where: { id: data.id },
+        raw: false,
+      });
+
+      if (product) {
+        product.productName = data.productName;
+        product.category = data.category;
+        product.cost = data.cost;
+        product.sale = data.sale;
+        product.image = data.image;
+        product.quantity = data.quantity;
+        product.description = data.description;
+        await product.save();
+
+        resolve({
+          errCode: 0,
+          errMessage: "Update the product succeeds",
+        });
+      } else {
+        resolve({
+          errCode: 1,
+          errMessage: "product not found",
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 module.exports = {
   getAllProducts: getAllProducts,
-  //   createNewCustomer: createNewCustomer,
-  //   deleteCustomer: deleteCustomer,
-  //   updateCustomerData: updateCustomerData,
+  createNewProduct: createNewProduct,
+  updateProductData: updateProductData,
+  deleteProduct: deleteProduct,
 };

@@ -17,31 +17,34 @@ let handleGetAllProduct = async (req, res) => {
   });
 };
 
-// let handleCreateNewCustomer = async (req, res) => {
-//   let message = await customerService.createNewCustomer(req.body);
+let handleCreateNewProduct = async (req, res) => {
+  let message = await productService.createNewProduct(req.body);
+  console.log("mes", message);
 
-//   return res.status(200).json(message);
-// };
-// let handleDeleteCustomer = async (req, res) => {
-//   if (!req.body.id) {
-//     return res.status(200).json({
-//       errCode: 1,
-//       message: "Missing required parameters",
-//       customers,
-//     });
-//   }
-//   let message = await customerService.deleteCustomer(req.body.id);
-//   return res.status(200).json(message);
-// };
-// let handleEditCustomer = async (req, res) => {
-//   let data = req.body;
-//   let message = await customerService.updateCustomerData(data);
-//   return res.status(200).json(message);
-// };
+  return res.status(200).json(message);
+};
+
+let handleDeleteProduct = async (req, res) => {
+  if (!req.body.id) {
+    return res.status(200).json({
+      errCode: 1,
+      message: "Missing required parameters",
+      products,
+    });
+  }
+  let message = await productService.deleteProduct(req.body.id);
+  return res.status(200).json(message);
+};
+
+let handleEditProduct = async (req, res) => {
+  let data = req.body;
+  let message = await productService.updateProductData(data);
+  return res.status(200).json(message);
+};
 
 module.exports = {
   handleGetAllProduct: handleGetAllProduct,
-  //   handleCreateNewCustomer: handleCreateNewCustomer,
-  //   handleEditCustomer: handleEditCustomer,
-  //   handleDeleteCustomer: handleDeleteCustomer,
+  handleCreateNewProduct: handleCreateNewProduct,
+  handleEditProduct: handleEditProduct,
+  handleDeleteProduct: handleDeleteProduct,
 };
