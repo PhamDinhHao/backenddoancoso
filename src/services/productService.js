@@ -11,6 +11,7 @@ let getAllProducts = (productId) => {
             // exclude: ['password']
           },
 
+          nest: true
 
 
         });
@@ -21,6 +22,7 @@ let getAllProducts = (productId) => {
           attributes: {
             // exclude: ['password']
           },
+          nest: true
         });
       }
       resolve(products);
