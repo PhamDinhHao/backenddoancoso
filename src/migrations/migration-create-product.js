@@ -40,6 +40,10 @@ module.exports = {
             description: {
                 type: Sequelize.STRING
             },
+            supplierId: {
+                type: Sequelize.INTEGER
+            },
+
 
             createdAt: {
                 allowNull: false,

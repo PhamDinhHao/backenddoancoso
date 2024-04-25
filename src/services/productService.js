@@ -10,6 +10,9 @@ let getAllProducts = (productId) => {
           attributes: {
             // exclude: ['password']
           },
+
+
+
         });
       }
       if (productId && productId != "ALL") {

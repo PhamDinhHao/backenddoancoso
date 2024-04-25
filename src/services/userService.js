@@ -110,16 +110,17 @@ let createNewUser = (data) => {
             }
             else {
                 let hashPasswordFromBrypt = await hashUserPassword(data.password);
+
                 await db.User.create({
                     email: data.email,
                     password: hashPasswordFromBrypt,
-                    firstName: data.firstName,
-                    lastName: data.lastName,
+                    name: data.name,
+
                     address: data.address,
                     phonenumber: data.phonenumber,
                     gender: data.gender,
                     roleId: data.roleId,
-                    positionId: data.positionId
+
 
                 })
                 resolve({
@@ -195,9 +196,12 @@ let updateUserData = (data) => {
             })
 
             if (user) {
-                user.firstName = data.firstName;
-                user.lastName = data.lastName;
+
+                user.name = data.name;
                 user.address = data.address;
+                user.phoneNumber = data.phoneNumber;
+                user.gender = data.gender;
+                user.roleId = data.roleId;
                 await user.save();
 
                 resolve({
@@ -216,34 +220,34 @@ let updateUserData = (data) => {
         }
     })
 }
-let getAllCodeService = (typeInput) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            if (!typeInput) {
-                resolve({
-                    errCode: 1,
-                    errMessage: 'Missing required parameters!'
-                })
-            } else {
-                let res = {};
-                let allcode = await db.Allcode.findAll({
-                    where: { type: typeInput }
-                });
-                res.errCode = 0;
-                res.data = allcode;
-                resolve(res);
-            }
+// let getAllCodeService = (typeInput) => {
+//     return new Promise(async (resolve, reject) => {
+//         try {
+//             if (!typeInput) {
+//                 resolve({
+//                     errCode: 1,
+//                     errMessage: 'Missing required parameters!'
+//                 })
+//             } else {
+//                 let res = {};
+//                 let allcode = await db.Allcode.findAll({
+//                     where: { type: typeInput }
+//                 });
+//                 res.errCode = 0;
+//                 res.data = allcode;
+//                 resolve(res);
+//             }
 
-        } catch (error) {
-            reject(error)
-        }
-    })
-}
+//         } catch (error) {
+//             reject(error)
+//         }
+//     })
+// }
 module.exports = {
     handleUserLogin: handleUserLogin,
     getAllUsers: getAllUsers,
     createNewUser: createNewUser,
     deleteUser: deleteUser,
     updateUserData: updateUserData,
-    getAllCodeService: getAllCodeService,
+    // getAllCodeService: getAllCodeService,
 }
