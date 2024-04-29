@@ -4,8 +4,8 @@ const { sequelize } = require("../models");
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("Purchases", {
-      // purchaseDate: DataTypes.DATE,
+    await queryInterface.createTable("Units", {
+      // unitName: DataTypes.STRING,
 
       id: {
         allowNull: false,
@@ -13,8 +13,8 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      purchaseDate: {
-        type: Sequelize.DATE,
+      unitName: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
@@ -27,6 +27,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("Purchases");
+    await queryInterface.dropTable("Units");
   },
 };
