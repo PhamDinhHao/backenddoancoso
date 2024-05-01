@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         quantity: DataTypes.INTEGER,
         total: DataTypes.INTEGER,
         note: DataTypes.STRING
+        
 
 
 
