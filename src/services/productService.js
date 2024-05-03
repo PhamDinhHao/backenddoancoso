@@ -33,13 +33,13 @@ let getAllProducts = (productId) => {
 };
 
 let createNewProduct = (data) => {
+  console.log("check data", data)
   return new Promise(async (resolve, reject) => {
     try {
       await db.Product.create({
         productName: data.productName,
         category: data.category,
-        cost: data.cost,
-        sale: data.sale,
+
         image: data.image,
         quantity: data.quantity,
         description: data.description,
@@ -100,9 +100,7 @@ let updateProductData = (data) => {
 
       if (product) {
         product.productName = data.productName;
-        product.category = data.category;
-        product.cost = data.cost;
-        product.sale = data.sale;
+
         product.image = data.image;
         product.quantity = data.quantity;
         product.description = data.description;
