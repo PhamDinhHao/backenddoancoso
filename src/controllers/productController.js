@@ -40,9 +40,29 @@ let handleEditProduct = async (req, res) => {
   return res.status(200).json(message);
 };
 
+let handleGetProductSuggestions = async (req, res) => {
+  try {
+    const { q } = req.query;
+    console.log("Query value:", q);
+    const suggestions = await productService.getProductSuggestions(q);
+    return res.status(200).json({
+      errCode: 0,
+      message: "ok",
+      suggestions,
+    });
+  } catch (error) {
+    console.error("Error fetching product suggestions:", error);
+    return res.status(500).json({
+      errCode: 1,
+      message: "Internal server error",
+    });
+  }
+};
+
 module.exports = {
   handleGetAllProduct: handleGetAllProduct,
   handleCreateNewProduct: handleCreateNewProduct,
   handleEditProduct: handleEditProduct,
   handleDeleteProduct: handleDeleteProduct,
+  handleGetProductSuggestions: handleGetProductSuggestions,
 };

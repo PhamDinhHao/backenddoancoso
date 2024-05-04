@@ -34,7 +34,6 @@ let initWebRoutes = (app) => {
     "/api/delete-supplier",
     supplierController.handleDeleteSupplier
   );
-
   router.get(
     "/api/get-supplier-suggestion",
     supplierController.handleGetSupplierSuggestions
@@ -58,6 +57,10 @@ let initWebRoutes = (app) => {
   );
   router.put("/api/edit-product", productController.handleEditProduct);
   router.delete("/api/delete-product", productController.handleDeleteProduct);
+  router.get(
+    "/api/get-product-suggestion",
+    productController.handleGetProductSuggestions
+  );
 
   router.get("/api/allcode", userController.getAllCode);
   return app.use("/", router);
