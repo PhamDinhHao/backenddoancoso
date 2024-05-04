@@ -35,6 +35,11 @@ let initWebRoutes = (app) => {
     supplierController.handleDeleteSupplier
   );
 
+  router.get(
+    "/api/get-supplier-suggestion",
+    supplierController.handleGetSupplierSuggestions
+  );
+
   router.get("/api/get-all-customer", customerController.handleGetAllCustomer);
   router.post(
     "/api/create-new-customer",
