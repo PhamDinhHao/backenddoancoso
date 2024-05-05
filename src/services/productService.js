@@ -10,8 +10,27 @@ let getAllProducts = (productId) => {
           attributes: {
             // exclude: ['password']
           },
+          include: [
+            {
+              model: db.Supplier,
+              as: 'Supplier',
+              attributes: ['id', 'name']
+            },
+            {
+              model: db.Category,
+              as: 'Category',
+              attributes: ['id', 'categoryName']
+            },
+            {
+              model: db.Unit,
+              as: 'Unit',
+              attributes: ['id', 'unitName']
+            },
 
+
+          ],
           nest: true
+
 
 
         });
@@ -33,16 +52,19 @@ let getAllProducts = (productId) => {
 };
 
 let createNewProduct = (data) => {
-  console.log("check data", data)
+
   return new Promise(async (resolve, reject) => {
     try {
       await db.Product.create({
         productName: data.productName,
-        category: data.category,
-
+        categoryId: data.selectedCategory.value,
+        supplierId: data.selectedSupplier.value,
+        unitId: data.selectedUnit.value,
         image: data.image,
         quantity: data.quantity,
         description: data.description,
+        costPrice: data.costPrice,
+        salePrice: data.salePrice
       });
       resolve({
         errCode: 0,
@@ -100,10 +122,14 @@ let updateProductData = (data) => {
 
       if (product) {
         product.productName = data.productName;
-
+        product.categoryId = data.selectedCategory.value;
+        product.supplierId = data.selectedSupplier.value;
+        product.unitId = data.selectedUnit.value;
         product.image = data.image;
         product.quantity = data.quantity;
         product.description = data.description;
+        product.costPrice = data.costPrice;
+        product.salePrice = data.salePrice
         await product.save();
 
         resolve({

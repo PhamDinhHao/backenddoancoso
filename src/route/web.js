@@ -4,7 +4,8 @@ import userController from "../controllers/userController";
 import supplierController from "../controllers/supplierController";
 import customerController from "../controllers/customerController";
 import productController from "../controllers/productController";
-
+import categoryController from "../controllers/categoryController";
+import unitController from "../controllers/unitController";
 let router = express.Router();
 
 let initWebRoutes = (app) => {
@@ -60,6 +61,17 @@ let initWebRoutes = (app) => {
   router.delete("/api/delete-product", productController.handleDeleteProduct);
 
   router.get("/api/allcode", userController.getAllCode);
+
+  router.get("/api/get-all-category", categoryController.handleGetAllCategory);
+  router.post(
+    "/api/create-new-category",
+    categoryController.handleCreateNewCategory
+  );
+  router.get("/api/get-all-unit", unitController.handleGetAllUnit);
+  router.post(
+    "/api/create-new-unit",
+    unitController.handleCreateNewUnit
+  );
   return app.use("/", router);
 };
 module.exports = initWebRoutes;
