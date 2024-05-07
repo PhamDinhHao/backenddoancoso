@@ -41,7 +41,7 @@ let getAllProducts = (productId) => {
           attributes: {
             // exclude: ['password']
           },
-          nest: true
+          nest: true,
         });
       }
       resolve(products);
@@ -148,9 +148,27 @@ let updateProductData = (data) => {
   });
 };
 
+let getProductSuggestions = async (query) => {
+  try {
+    console.log("Query value in service:", query);
+    const suggestions = await db.Product.findAll({
+      where: {
+        productName: {
+          [db.Sequelize.Op.like]: `%${query}%`, // Assuming 'name' is the field to search for suggestions
+        },
+      },
+      attributes: ["id", "productName", "salePrice"], // Include only necessary attributes
+    });
+    return suggestions;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   getAllProducts: getAllProducts,
   createNewProduct: createNewProduct,
   updateProductData: updateProductData,
   deleteProduct: deleteProduct,
+  getProductSuggestions: getProductSuggestions,
 };
