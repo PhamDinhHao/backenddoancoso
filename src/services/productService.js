@@ -10,7 +10,23 @@ let getAllProducts = (productId) => {
           attributes: {
             // exclude: ['password']
           },
-
+          include: [
+            {
+              model: db.Supplier,
+              as: "Supplier",
+              attributes: ["id", "name"],
+            },
+            {
+              model: db.Category,
+              as: "Category",
+              attributes: ["id", "categoryName"],
+            },
+            {
+              model: db.Unit,
+              as: "Unit",
+              attributes: ["id", "unitName"],
+            },
+          ],
           nest: true,
         });
       }
@@ -35,12 +51,14 @@ let createNewProduct = (data) => {
     try {
       await db.Product.create({
         productName: data.productName,
-        category: data.category,
-        cost: data.cost,
-        sale: data.sale,
+        categoryId: data.selectedCategory.value,
+        supplierId: data.selectedSupplier.value,
+        unitId: data.selectedUnit.value,
         image: data.image,
         quantity: data.quantity,
         description: data.description,
+        costPrice: data.costPrice,
+        salePrice: data.salePrice,
       });
       resolve({
         errCode: 0,
@@ -98,12 +116,14 @@ let updateProductData = (data) => {
 
       if (product) {
         product.productName = data.productName;
-        product.category = data.category;
-        product.cost = data.cost;
-        product.sale = data.sale;
+        product.categoryId = data.selectedCategory.value;
+        product.supplierId = data.selectedSupplier.value;
+        product.unitId = data.selectedUnit.value;
         product.image = data.image;
         product.quantity = data.quantity;
         product.description = data.description;
+        product.costPrice = data.costPrice;
+        product.salePrice = data.salePrice;
         await product.save();
 
         resolve({
@@ -131,7 +151,7 @@ let getProductSuggestions = async (query) => {
           [db.Sequelize.Op.like]: `%${query}%`, // Assuming 'name' is the field to search for suggestions
         },
       },
-      attributes: ["id", "productName"], // Include only necessary attributes
+      attributes: ["id", "productName", "costPrice"], // Include only necessary attributes
     });
     return suggestions;
   } catch (error) {

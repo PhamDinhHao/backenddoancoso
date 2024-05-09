@@ -40,7 +40,7 @@ let handleEditSupplier = async (req, res) => {
 let handleGetSupplierSuggestions = async (req, res) => {
   try {
     const { q } = req.query;
-    console.log("Query value:", q);
+
     const suggestions = await supplierService.getSupplierSuggestions(q);
     return res.status(200).json({
       errCode: 0,
