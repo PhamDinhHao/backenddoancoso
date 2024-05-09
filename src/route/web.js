@@ -4,7 +4,9 @@ import userController from "../controllers/userController";
 import supplierController from "../controllers/supplierController";
 import customerController from "../controllers/customerController";
 import productController from "../controllers/productController";
-
+import categoryController from "../controllers/categoryController";
+import unitController from "../controllers/unitController";
+import purchaseController from "../controllers/purchaseController";
 let router = express.Router();
 
 let initWebRoutes = (app) => {
@@ -34,6 +36,10 @@ let initWebRoutes = (app) => {
     "/api/delete-supplier",
     supplierController.handleDeleteSupplier
   );
+  router.get(
+    "/api/get-supplier-suggestion",
+    supplierController.handleGetSupplierSuggestions
+  );
 
   router.get("/api/get-all-customer", customerController.handleGetAllCustomer);
   router.post(
@@ -53,8 +59,30 @@ let initWebRoutes = (app) => {
   );
   router.put("/api/edit-product", productController.handleEditProduct);
   router.delete("/api/delete-product", productController.handleDeleteProduct);
+  router.get(
+    "/api/get-product-suggestion",
+    productController.handleGetProductSuggestions
+  );
 
   router.get("/api/allcode", userController.getAllCode);
+
+  router.get("/api/get-all-category", categoryController.handleGetAllCategory);
+  router.post(
+    "/api/create-new-category",
+    categoryController.handleCreateNewCategory
+  );
+
+  router.post(
+    "/api/create-new-purchase",
+    purchaseController.handleCreateNewPurchase
+  );
+  router.post(
+    "/api/create-new-purchase-detail",
+    purchaseController.handleCreateNewPurchaseDetail
+  );
+
+  router.get("/api/get-all-unit", unitController.handleGetAllUnit);
+  router.post("/api/create-new-unit", unitController.handleCreateNewUnit);
   return app.use("/", router);
 };
 module.exports = initWebRoutes;

@@ -10,10 +10,24 @@ let getAllProducts = (productId) => {
           attributes: {
             // exclude: ['password']
           },
-
-          nest: true
-
-
+          include: [
+            {
+              model: db.Supplier,
+              as: "Supplier",
+              attributes: ["id", "name"],
+            },
+            {
+              model: db.Category,
+              as: "Category",
+              attributes: ["id", "categoryName"],
+            },
+            {
+              model: db.Unit,
+              as: "Unit",
+              attributes: ["id", "unitName"],
+            },
+          ],
+          nest: true,
         });
       }
       if (productId && productId != "ALL") {
@@ -22,7 +36,7 @@ let getAllProducts = (productId) => {
           attributes: {
             // exclude: ['password']
           },
-          nest: true
+          nest: true,
         });
       }
       resolve(products);
@@ -33,16 +47,18 @@ let getAllProducts = (productId) => {
 };
 
 let createNewProduct = (data) => {
-  console.log("check data", data)
   return new Promise(async (resolve, reject) => {
     try {
       await db.Product.create({
         productName: data.productName,
-        category: data.category,
-
+        categoryId: data.selectedCategory.value,
+        supplierId: data.selectedSupplier.value,
+        unitId: data.selectedUnit.value,
         image: data.image,
         quantity: data.quantity,
         description: data.description,
+        costPrice: data.costPrice,
+        salePrice: data.salePrice,
       });
       resolve({
         errCode: 0,
@@ -100,10 +116,14 @@ let updateProductData = (data) => {
 
       if (product) {
         product.productName = data.productName;
-
+        product.categoryId = data.selectedCategory.value;
+        product.supplierId = data.selectedSupplier.value;
+        product.unitId = data.selectedUnit.value;
         product.image = data.image;
         product.quantity = data.quantity;
         product.description = data.description;
+        product.costPrice = data.costPrice;
+        product.salePrice = data.salePrice;
         await product.save();
 
         resolve({
@@ -122,9 +142,27 @@ let updateProductData = (data) => {
   });
 };
 
+let getProductSuggestions = async (query) => {
+  try {
+    console.log("Query value in service:", query);
+    const suggestions = await db.Product.findAll({
+      where: {
+        productName: {
+          [db.Sequelize.Op.like]: `%${query}%`, // Assuming 'name' is the field to search for suggestions
+        },
+      },
+      attributes: ["id", "productName", "costPrice"], // Include only necessary attributes
+    });
+    return suggestions;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   getAllProducts: getAllProducts,
   createNewProduct: createNewProduct,
   updateProductData: updateProductData,
   deleteProduct: deleteProduct,
+  getProductSuggestions: getProductSuggestions,
 };

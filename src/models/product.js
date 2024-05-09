@@ -8,9 +8,9 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Product.belongsTo(models.Supplier, { foreignKey: "supplierId" });
-      Product.belongsTo(models.Unit, { foreignKey: "unitId" });
-      Product.belongsTo(models.Category, { foreignKey: "categoryId" });
+      Product.belongsTo(models.Supplier, { foreignKey: "supplierId", as: "Supplier" });
+      Product.belongsTo(models.Unit, { foreignKey: "unitId", as: "Unit" });
+      Product.belongsTo(models.Category, { foreignKey: "categoryId", as: "Category" });
       Product.belongsToMany(models.PurchaseDetail, {
         through: "ProductPurchaseDetail",
         foreignKey: "productId",
@@ -30,6 +30,8 @@ module.exports = (sequelize, DataTypes) => {
       supplierId: DataTypes.INTEGER,
       unitId: DataTypes.INTEGER,
       categoryId: DataTypes.INTEGER,
+      costPrice: DataTypes.INTEGER,
+      salePrice: DataTypes.INTEGER,
     },
     {
       sequelize,
