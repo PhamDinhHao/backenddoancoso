@@ -39,7 +39,24 @@ let handleEditCustomer = async (req, res) => {
 }
 
 
+let handleGetCustomerSuggestions = async (req, res) => {
+    try {
+        const { q } = req.query;
 
+        const suggestions = await customerService.getCustomerSuggestions(q);
+        return res.status(200).json({
+            errCode: 0,
+            message: "ok",
+            suggestions,
+        });
+    } catch (error) {
+        console.error("Error fetching customer suggestions:", error);
+        return res.status(500).json({
+            errCode: 1,
+            message: "Internal server error",
+        });
+    }
+};
 
 module.exports = {
 
@@ -47,6 +64,7 @@ module.exports = {
     handleCreateNewCustomer: handleCreateNewCustomer,
     handleEditCustomer: handleEditCustomer,
     handleDeleteCustomer: handleDeleteCustomer,
+    handleGetCustomerSuggestions: handleGetCustomerSuggestions
 
 
 }

@@ -7,6 +7,7 @@ import productController from "../controllers/productController";
 import categoryController from "../controllers/categoryController";
 import unitController from "../controllers/unitController";
 import purchaseController from "../controllers/purchaseController";
+import saleController from "../controllers/saleController"
 let router = express.Router();
 
 let initWebRoutes = (app) => {
@@ -51,6 +52,10 @@ let initWebRoutes = (app) => {
     "/api/delete-customer",
     customerController.handleDeleteCustomer
   );
+  router.get(
+    "/api/get-customer-suggestion",
+    customerController.handleGetCustomerSuggestions
+  );
 
   router.get("/api/get-all-product", productController.handleGetAllProduct);
   router.post(
@@ -83,6 +88,14 @@ let initWebRoutes = (app) => {
 
   router.get("/api/get-all-unit", unitController.handleGetAllUnit);
   router.post("/api/create-new-unit", unitController.handleCreateNewUnit);
+  router.post(
+    "/api/create-new-sale",
+    saleController.handleCreateNewSale
+  );
+  router.post(
+    "/api/create-new-sale-detail",
+    saleController.handleCreateNewSaleDetail
+  );
   return app.use("/", router);
 };
 module.exports = initWebRoutes;

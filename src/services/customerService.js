@@ -128,11 +128,28 @@ let updateCustomerData = (data) => {
         }
     })
 }
+let getCustomerSuggestions = async (query) => {
+    try {
+        console.log("Query value in service:", query);
+        const suggestions = await db.Customer.findAll({
+            where: {
+                name: {
+                    [db.Customer.Op.like]: `%${query}%`, // Assuming 'name' is the field to search for suggestions
+                },
+            },
+            attributes: ["id", "name"], // Include only necessary attributes
+        });
+        return suggestions;
+    } catch (error) {
+        throw error;
+    }
+};
 module.exports = {
     getAllCustomers: getAllCustomers,
     createNewCustomer: createNewCustomer,
     deleteCustomer: deleteCustomer,
-    updateCustomerData: updateCustomerData
+    updateCustomerData: updateCustomerData,
+    getCustomerSuggestions: getCustomerSuggestions
 
 
 
