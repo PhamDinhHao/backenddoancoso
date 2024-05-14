@@ -41,9 +41,9 @@ let handleEditCustomer = async (req, res) => {
 
 let handleGetCustomerSuggestions = async (req, res) => {
     try {
-        const { q } = req.query;
+        const q = req.query;
 
-        const suggestions = await customerService.getCustomerSuggestions(q);
+        const suggestions = await customerService.getCustomerSuggestions(q[0]);
         return res.status(200).json({
             errCode: 0,
             message: "ok",

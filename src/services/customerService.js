@@ -130,14 +130,15 @@ let updateCustomerData = (data) => {
 }
 let getCustomerSuggestions = async (query) => {
     try {
-        console.log("Query value in service:", query);
+
         const suggestions = await db.Customer.findAll({
             where: {
                 name: {
-                    [db.Customer.Op.like]: `%${query}%`, // Assuming 'name' is the field to search for suggestions
+                    [db.Sequelize.Op.like]: `%${query}%`, // Assuming 'name' is the field to search for suggestions
                 },
             },
             attributes: ["id", "name"], // Include only necessary attributes
+            limit: 10,
         });
         return suggestions;
     } catch (error) {

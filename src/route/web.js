@@ -52,10 +52,7 @@ let initWebRoutes = (app) => {
     "/api/delete-customer",
     customerController.handleDeleteCustomer
   );
-  router.get(
-    "/api/get-customer-suggestion",
-    customerController.handleGetCustomerSuggestions
-  );
+  router.get('/api/get-customer-suggestion', customerController.handleGetCustomerSuggestions);
 
   router.get("/api/get-all-product", productController.handleGetAllProduct);
   router.post(

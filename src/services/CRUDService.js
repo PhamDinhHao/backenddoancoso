@@ -9,7 +9,7 @@ let createNewUser = async (data) => {
             await db.User.create({
                 email: data.email,
                 password: hashPasswordFromBrypt,
-                firstName: data.firstName,
+                name: data.firstName,
                 lastName: data.lastName,
                 address: data.address,
                 phonenumber: data.phonenumber,
