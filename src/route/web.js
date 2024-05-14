@@ -68,6 +68,10 @@ let initWebRoutes = (app) => {
     "/api/get-product-suggestion",
     productController.handleGetProductSuggestions
   );
+  router.get(
+    "/api/get-product-by-purchaseid",
+    productController.handleGetProductsInPurchaseDetails
+  );
 
   router.get("/api/allcode", userController.getAllCode);
 
