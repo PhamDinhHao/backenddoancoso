@@ -6,6 +6,8 @@ let createNewPurchase = (data) => {
     try {
       let newPurchase = await db.Purchase.create({
         purchaseDate: data.purchaseDate,
+        supplierId: data.supplierId,
+        total: data.total,
       });
 
       let purchaseId = newPurchase.id;
@@ -42,7 +44,50 @@ let createNewPurchaseDetail = (data) => {
   });
 };
 
+let getAllPurchase = (purchaseId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let purchases = "";
+
+      if (purchaseId === "ALL" || !purchaseId) {
+        purchases = db.Purchase.findAll({
+          attributes: {
+            // exclude: ['password']
+          },
+          include: [
+            {
+              model: db.Supplier,
+              as: "Supplier",
+              attributes: ["id", "name"],
+            },
+          ],
+          nest: true,
+        });
+      } else {
+        purchases = db.Purchase.findOne({
+          where: { id: purchaseId },
+          attributes: {
+            // exclude: ['password']
+          },
+          include: [
+            {
+              model: db.Supplier,
+              as: "Supplier",
+              attributes: ["id", "name"],
+            },
+          ],
+          nest: true,
+        });
+      }
+      resolve(purchases);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   createNewPurchase: createNewPurchase,
   createNewPurchaseDetail: createNewPurchaseDetail,
+  getAllPurchase: getAllPurchase,
 };

@@ -17,7 +17,25 @@ let handleCreateNewPurchaseDetail = async (req, res) => {
   }
 };
 
+let handleGetAllPurchase = async (req, res) => {
+  let id = req.query.id;
+  if (!id) {
+    return res.status(200).json({
+      errCode: 1,
+      message: "Missing required parameters",
+      purchases,
+    });
+  }
+  let purchases = await purchaseService.getAllPurchase(id);
+  return res.status(200).json({
+    errCode: 0,
+    message: "ok",
+    purchases,
+  });
+};
+
 module.exports = {
   handleCreateNewPurchase: handleCreateNewPurchase,
   handleCreateNewPurchaseDetail: handleCreateNewPurchaseDetail,
+  handleGetAllPurchase: handleGetAllPurchase,
 };
