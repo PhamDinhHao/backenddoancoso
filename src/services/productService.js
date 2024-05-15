@@ -159,10 +159,59 @@ let getProductSuggestions = async (query) => {
   }
 };
 
+let getProductsInPurchaseDetails = async (purchaseId) => {
+  try {
+    // Lấy danh sách purchaseDetail dựa trên purchaseId
+    let purchaseDetails = await db.PurchaseDetail.findAll({
+      where: { purchaseId: purchaseId },
+      attributes: ["productId", "quantity", "total"],
+      raw: true,
+    });
+
+    if (!purchaseDetails || purchaseDetails.length === 0) {
+      return {
+        errCode: 2,
+        errMessage: "No purchase details found",
+      };
+    }
+
+    // Lấy danh sách productId từ purchaseDetails
+    const productIds = purchaseDetails.map((detail) => detail.productId);
+
+    // Lấy thông tin chi tiết của các sản phẩm từ bảng products
+    let products = await db.Product.findAll({
+      where: {
+        id: productIds,
+      },
+      attributes: ["id", "productName", "costPrice"],
+      raw: true,
+    });
+
+    // Kết hợp thông tin sản phẩm với purchaseDetails
+    let combinedResults = purchaseDetails.map((detail) => {
+      let product = products.find((product) => product.id === detail.productId);
+      return {
+        ...product,
+        quantity: detail.quantity,
+        total: detail.total,
+      };
+    });
+
+    return {
+      errCode: 0,
+      data: combinedResults,
+    };
+  } catch (error) {
+    console.log("Error in getProductsInPurchaseDetails:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   getAllProducts: getAllProducts,
   createNewProduct: createNewProduct,
   updateProductData: updateProductData,
   deleteProduct: deleteProduct,
   getProductSuggestions: getProductSuggestions,
+  getProductsInPurchaseDetails: getProductsInPurchaseDetails,
 };

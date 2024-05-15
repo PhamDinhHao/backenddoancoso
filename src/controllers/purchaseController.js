@@ -17,7 +17,45 @@ let handleCreateNewPurchaseDetail = async (req, res) => {
   }
 };
 
+let handleGetAllPurchase = async (req, res) => {
+  let id = req.query.id;
+  if (!id) {
+    return res.status(200).json({
+      errCode: 1,
+      message: "Missing required parameters",
+      purchases,
+    });
+  }
+  let purchases = await purchaseService.getAllPurchase(id);
+  return res.status(200).json({
+    errCode: 0,
+    message: "ok",
+    purchases,
+  });
+};
+
+let handleEditPurchaseAndDetails = async (req, res) => {
+  try {
+    const { purchase, purchaseDetails } = req.body;
+    // console.log("Received data:", { purchase, purchaseDetails });
+    let response = await purchaseService.EditPurchaseAndDetails(
+      purchase,
+      purchaseDetails
+    );
+
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error("Error in updatePurchaseAndDetails:", error);
+    return res.status(500).json({
+      errCode: 1,
+      message: "Error updating purchase and details",
+    });
+  }
+};
+
 module.exports = {
   handleCreateNewPurchase: handleCreateNewPurchase,
   handleCreateNewPurchaseDetail: handleCreateNewPurchaseDetail,
+  handleGetAllPurchase: handleGetAllPurchase,
+  handleEditPurchaseAndDetails: handleEditPurchaseAndDetails,
 };

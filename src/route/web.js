@@ -7,7 +7,7 @@ import productController from "../controllers/productController";
 import categoryController from "../controllers/categoryController";
 import unitController from "../controllers/unitController";
 import purchaseController from "../controllers/purchaseController";
-import saleController from "../controllers/saleController"
+import saleController from "../controllers/saleController";
 let router = express.Router();
 
 let initWebRoutes = (app) => {
@@ -65,6 +65,10 @@ let initWebRoutes = (app) => {
     "/api/get-product-suggestion",
     productController.handleGetProductSuggestions
   );
+  router.get(
+    "/api/get-product-by-purchaseid",
+    productController.handleGetProductsInPurchaseDetails
+  );
 
   router.get("/api/allcode", userController.getAllCode);
 
@@ -82,13 +86,15 @@ let initWebRoutes = (app) => {
     "/api/create-new-purchase-detail",
     purchaseController.handleCreateNewPurchaseDetail
   );
+  router.get("/api/get-all-purchase", purchaseController.handleGetAllPurchase);
+  router.put(
+    "/api/edit-purchase-and-details",
+    purchaseController.handleEditPurchaseAndDetails
+  );
 
   router.get("/api/get-all-unit", unitController.handleGetAllUnit);
   router.post("/api/create-new-unit", unitController.handleCreateNewUnit);
-  router.post(
-    "/api/create-new-sale",
-    saleController.handleCreateNewSale
-  );
+  router.post("/api/create-new-sale", saleController.handleCreateNewSale);
   router.post(
     "/api/create-new-sale-detail",
     saleController.handleCreateNewSaleDetail
