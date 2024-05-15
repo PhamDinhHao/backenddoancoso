@@ -90,6 +90,10 @@ let initWebRoutes = (app) => {
     purchaseController.handleCreateNewPurchaseDetail
   );
   router.get("/api/get-all-purchase", purchaseController.handleGetAllPurchase);
+  router.put(
+    "/api/edit-purchase-and-details",
+    purchaseController.handleEditPurchaseAndDetails
+  );
 
   router.get("/api/get-all-unit", unitController.handleGetAllUnit);
   router.post("/api/create-new-unit", unitController.handleCreateNewUnit);
