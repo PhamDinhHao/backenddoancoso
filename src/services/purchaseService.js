@@ -96,28 +96,75 @@ let EditPurchaseAndDetails = async (purchase, purchaseDetails) => {
       { where: { id: purchase.purchaseId } }
     );
 
+    const existingDetails = await db.PurchaseDetail.findAll({
+      where: { purchaseId: purchase.purchaseId },
+      raw: true,
+    });
+
+    const detailsToUpdate = [];
+    const detailsToCreate = [];
+    const detailsToDelete = [];
+
+    // Lưu trữ các productId hiện có để kiểm tra
+    const existingDetailMap = existingDetails.reduce((map, detail) => {
+      map[detail.productId] = detail;
+      return map;
+    }, {});
+
+    // Phân loại các chi tiết sản phẩm để cập nhật hoặc thêm mới
     for (let detail of purchaseDetails) {
-      if (detail.id) {
-        await db.PurchaseDetail.update(
-          {
-            quantity: detail.quantity,
-            costPrice: detail.costPrice,
-            total: detail.total,
-          },
-          {
-            where: { id: detail.id },
-          }
-        );
+      if (existingDetailMap[detail.productId]) {
+        // Chi tiết đã tồn tại, cần cập nhật
+        detailsToUpdate.push({
+          ...detail,
+          id: existingDetailMap[detail.productId].id, // Lấy id từ existingDetailMap
+        });
+        // Xóa chi tiết này khỏi existingDetailMap để xác định những chi tiết còn lại để xóa
+        delete existingDetailMap[detail.productId];
       } else {
-        // Nếu không có id, sản phẩm chưa tồn tại trong danh sách chi tiết mua hàng
-        await db.PurchaseDetail.create({
-          purchaseId: detail.purchaseId,
-          productId: detail.productId,
+        // Chi tiết mới, cần thêm mới
+        detailsToCreate.push(detail);
+      }
+    }
+
+    // Các chi tiết còn lại trong existingDetailMap là những chi tiết cần xóa
+    for (let productId in existingDetailMap) {
+      detailsToDelete.push(existingDetailMap[productId].id);
+    }
+
+    // console.log("Existing Details:", existingDetails);
+    // console.log("Purchase Details:", purchaseDetails);
+    // console.log("Details to Update:", detailsToUpdate);
+    // console.log("Details to Create:", detailsToCreate);
+    // console.log("Details to Delete:", detailsToDelete);
+
+    for (let detail of detailsToUpdate) {
+      await db.PurchaseDetail.update(
+        {
           quantity: detail.quantity,
           costPrice: detail.costPrice,
           total: detail.total,
-        });
-      }
+        },
+        {
+          where: { id: detail.id },
+        }
+      );
+    }
+
+    for (let detail of detailsToCreate) {
+      await db.PurchaseDetail.create({
+        purchaseId: detail.purchaseId,
+        productId: detail.productId,
+        quantity: detail.quantity,
+        costPrice: detail.costPrice,
+        total: detail.total,
+      });
+    }
+
+    for (let id of detailsToDelete) {
+      await db.PurchaseDetail.destroy({
+        where: { id: id },
+      });
     }
 
     return {
