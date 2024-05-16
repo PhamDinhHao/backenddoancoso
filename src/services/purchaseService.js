@@ -1,5 +1,6 @@
 import { request } from "express";
 import db from "../models/index";
+import { where } from "sequelize";
 
 let createNewPurchase = (data) => {
   return new Promise(async (resolve, reject) => {
@@ -33,6 +34,28 @@ let createNewPurchaseDetail = (data) => {
         costPrice: data.costPrice,
         total: data.total,
       });
+
+      let product = await db.Product.findOne({
+        where: { id: data.productId },
+        attributes: ["quantity"],
+      });
+
+      if (!product) {
+        return resolve({
+          errCode: 1,
+          errMessage: "Product not found",
+        });
+      }
+
+      // Cộng quantity của PurchaseDetail vào quantity của sản phẩm tìm được
+      let newQuantity = product.quantity + data.quantity;
+
+      // Cập nhật quantity mới trong bảng Product
+      await db.Product.update(
+        { quantity: newQuantity },
+        { where: { id: data.productId } }
+      );
+
       resolve({
         errCode: 0,
         errMessage: "Purchase detail created successfully",
@@ -88,6 +111,7 @@ let getAllPurchase = (purchaseId) => {
 
 let EditPurchaseAndDetails = async (purchase, purchaseDetails) => {
   try {
+    // Cập nhật thông tin purchase
     await db.Purchase.update(
       {
         supplierId: purchase.supplierId,
@@ -96,6 +120,7 @@ let EditPurchaseAndDetails = async (purchase, purchaseDetails) => {
       { where: { id: purchase.purchaseId } }
     );
 
+    // Lấy danh sách các chi tiết mua hàng hiện có
     const existingDetails = await db.PurchaseDetail.findAll({
       where: { purchaseId: purchase.purchaseId },
       raw: true,
@@ -105,7 +130,7 @@ let EditPurchaseAndDetails = async (purchase, purchaseDetails) => {
     const detailsToCreate = [];
     const detailsToDelete = [];
 
-    // Lưu trữ các productId hiện có để kiểm tra
+    // Lưu trữ các chi tiết hiện có để kiểm tra
     const existingDetailMap = existingDetails.reduce((map, detail) => {
       map[detail.productId] = detail;
       return map;
@@ -118,6 +143,7 @@ let EditPurchaseAndDetails = async (purchase, purchaseDetails) => {
         detailsToUpdate.push({
           ...detail,
           id: existingDetailMap[detail.productId].id, // Lấy id từ existingDetailMap
+          oldQuantity: existingDetailMap[detail.productId].quantity, // Lưu lại quantity cũ để biết tăng hay giảm
         });
         // Xóa chi tiết này khỏi existingDetailMap để xác định những chi tiết còn lại để xóa
         delete existingDetailMap[detail.productId];
@@ -129,16 +155,23 @@ let EditPurchaseAndDetails = async (purchase, purchaseDetails) => {
 
     // Các chi tiết còn lại trong existingDetailMap là những chi tiết cần xóa
     for (let productId in existingDetailMap) {
-      detailsToDelete.push(existingDetailMap[productId].id);
+      detailsToDelete.push(existingDetailMap[productId]);
     }
 
-    // console.log("Existing Details:", existingDetails);
-    // console.log("Purchase Details:", purchaseDetails);
-    // console.log("Details to Update:", detailsToUpdate);
-    // console.log("Details to Create:", detailsToCreate);
-    // console.log("Details to Delete:", detailsToDelete);
-
+    // Cập nhật các chi tiết mua hàng hiện có
     for (let detail of detailsToUpdate) {
+      let product = await db.Product.findOne({
+        where: { id: detail.productId },
+      });
+      if (product) {
+        let quantityDiff = detail.quantity - detail.oldQuantity;
+        let newQuantity = product.quantity + quantityDiff;
+        await db.Product.update(
+          { quantity: newQuantity },
+          { where: { id: detail.productId } }
+        );
+      }
+
       await db.PurchaseDetail.update(
         {
           quantity: detail.quantity,
@@ -151,7 +184,19 @@ let EditPurchaseAndDetails = async (purchase, purchaseDetails) => {
       );
     }
 
+    // Thêm các chi tiết mua hàng mới
     for (let detail of detailsToCreate) {
+      let product = await db.Product.findOne({
+        where: { id: detail.productId },
+      });
+      if (product) {
+        let newQuantity = product.quantity + detail.quantity;
+        await db.Product.update(
+          { quantity: newQuantity },
+          { where: { id: detail.productId } }
+        );
+      }
+
       await db.PurchaseDetail.create({
         purchaseId: detail.purchaseId,
         productId: detail.productId,
@@ -161,9 +206,21 @@ let EditPurchaseAndDetails = async (purchase, purchaseDetails) => {
       });
     }
 
-    for (let id of detailsToDelete) {
+    // Xóa các chi tiết mua hàng
+    for (let detail of detailsToDelete) {
+      let product = await db.Product.findOne({
+        where: { id: detail.productId },
+      });
+      if (product) {
+        let newQuantity = product.quantity - detail.quantity;
+        await db.Product.update(
+          { quantity: newQuantity },
+          { where: { id: detail.productId } }
+        );
+      }
+
       await db.PurchaseDetail.destroy({
-        where: { id: id },
+        where: { id: detail.id },
       });
     }
 

@@ -164,7 +164,7 @@ let getProductsInPurchaseDetails = async (purchaseId) => {
     // Lấy danh sách purchaseDetail dựa trên purchaseId
     let purchaseDetails = await db.PurchaseDetail.findAll({
       where: { purchaseId: purchaseId },
-      attributes: ["productId", "quantity", "total"],
+      attributes: ["productId", "quantity", "costPrice", "total"],
       raw: true,
     });
 
@@ -183,8 +183,18 @@ let getProductsInPurchaseDetails = async (purchaseId) => {
       where: {
         id: productIds,
       },
-      attributes: ["id", "productName", "costPrice"],
+      attributes: ["id", "productName"],
       raw: true,
+    });
+
+    // Gán costPrice từ PurchaseDetail vào mỗi đối tượng sản phẩm trong products
+    products.forEach((product) => {
+      const matchingDetail = purchaseDetails.find(
+        (detail) => detail.productId === product.id
+      );
+      if (matchingDetail) {
+        product.costPrice = matchingDetail.costPrice;
+      }
     });
 
     // Kết hợp thông tin sản phẩm với purchaseDetails
