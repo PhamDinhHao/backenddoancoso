@@ -1,6 +1,6 @@
 import { request } from "express";
 import db from "../models/index";
-
+const { Op } = require('sequelize');
 let getAllProducts = (productId) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -45,6 +45,24 @@ let getAllProducts = (productId) => {
     }
   });
 };
+const handleGetProductDoneSale = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const soldProducts = await db.SaleDetail.findAll({
+        attributes: [
+          'productId',
+          [db.sequelize.fn('SUM', db.sequelize.col('quantity')), 'totalQuantity'],
+        ],
+
+        group: ['SaleDetail.productId'],
+      });
+      resolve(soldProducts);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 
 let createNewProduct = (data) => {
   return new Promise(async (resolve, reject) => {
@@ -59,6 +77,7 @@ let createNewProduct = (data) => {
         description: data.description,
         costPrice: data.costPrice,
         salePrice: data.salePrice,
+        waitTime: data.waitTime,
       });
       resolve({
         errCode: 0,
@@ -224,4 +243,5 @@ module.exports = {
   deleteProduct: deleteProduct,
   getProductSuggestions: getProductSuggestions,
   getProductsInPurchaseDetails: getProductsInPurchaseDetails,
+  handleGetProductDoneSale: handleGetProductDoneSale
 };

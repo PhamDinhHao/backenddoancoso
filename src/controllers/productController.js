@@ -16,7 +16,15 @@ let handleGetAllProduct = async (req, res) => {
     products,
   });
 };
+let handleGetProductDoneSale = async (req, res) => {
+  let productDoneSale = await productService.handleGetProductDoneSale();
 
+  return res.status(200).json({
+    errCode: 0,
+    message: "ok",
+    productDoneSale,
+  });
+};
 let handleCreateNewProduct = async (req, res) => {
   let message = await productService.createNewProduct(req.body);
   return res.status(200).json(message);
@@ -92,4 +100,5 @@ module.exports = {
   handleDeleteProduct: handleDeleteProduct,
   handleGetProductSuggestions: handleGetProductSuggestions,
   handleGetProductsInPurchaseDetails: handleGetProductsInPurchaseDetails,
+  handleGetProductDoneSale: handleGetProductDoneSale,
 };

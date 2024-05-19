@@ -45,6 +45,9 @@ module.exports = {
       salePrice: {
         type: Sequelize.INTEGER,
       },
+      waitTime: {
+        type: Sequelize.INTEGER,
+      },
 
       createdAt: {
         allowNull: false,

@@ -33,6 +33,26 @@ let createNewSaleDetail = (data) => {
 
                 total: data.total,
             });
+            let product = await db.Product.findOne({
+                where: { id: data.productId },
+                attributes: ["quantity"],
+            });
+
+            if (!product) {
+                return resolve({
+                    errCode: 1,
+                    errMessage: "Product not found",
+                });
+            }
+
+            // Cộng quantity của PurchaseDetail vào quantity của sản phẩm tìm được
+            let newQuantity = product.quantity - data.quantity;
+
+            // Cập nhật quantity mới trong bảng Product
+            await db.Product.update(
+                { quantity: newQuantity },
+                { where: { id: data.productId } }
+            );
             resolve({
                 errCode: 0,
                 errMessage: "Sale detail created successfully",

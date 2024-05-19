@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "supplierId",
         // as: "Supplier",
       });
-      Supplier.hasMany(models.Purchase, { foreignKey: "supplierId" });
+      Supplier.hasMany(models.Purchase, { foreignKey: "supplierId", as: "Supplier" });
     }
   }
   Supplier.init(
