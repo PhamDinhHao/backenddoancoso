@@ -101,6 +101,11 @@ let initWebRoutes = (app) => {
     "/api/create-new-sale-detail",
     saleController.handleCreateNewSaleDetail
   );
+
+  router.get("/api/total-sales-by-day", saleController.getTotalSalesByDay)
+
+  router.get("/api/total-sales-by-mon", saleController.getTotalSalesByMonth)
+  router.get("/api/total-purchase-by-day", purchaseController.getTotalPurchasesByDay)
   return app.use("/", router);
 };
 module.exports = initWebRoutes;

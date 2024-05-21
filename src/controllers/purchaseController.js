@@ -52,10 +52,22 @@ let handleEditPurchaseAndDetails = async (req, res) => {
     });
   }
 };
+let getTotalPurchasesByDay = async (req, res) => {
+  try {
+    const result = await purchaseService.getTotalPurchasesByDay();
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({
+      errCode: 1,
+      errMessage: "Internal server error",
+    });
+  }
+};
 
 module.exports = {
   handleCreateNewPurchase: handleCreateNewPurchase,
   handleCreateNewPurchaseDetail: handleCreateNewPurchaseDetail,
   handleGetAllPurchase: handleGetAllPurchase,
   handleEditPurchaseAndDetails: handleEditPurchaseAndDetails,
+  getTotalPurchasesByDay: getTotalPurchasesByDay
 };

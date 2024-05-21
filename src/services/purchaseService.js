@@ -1,7 +1,7 @@
 import { request } from "express";
 import db from "../models/index";
 import { where } from "sequelize";
-
+import { Op, Sequelize } from "sequelize";
 let createNewPurchase = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -233,10 +233,59 @@ let EditPurchaseAndDetails = async (purchase, purchaseDetails) => {
     throw error;
   }
 };
+const getStartDate = () => {
+  const currentDate = new Date();
+  return new Date(currentDate.setDate(currentDate.getDate() - 7));
+};
+
+const getTotalPurchasesByDay = async () => {
+  try {
+    const startDate = getStartDate();
+    const endDate = new Date();
+
+    const totalPurchasesByDay = await db.Purchase.findAll({
+      attributes: [
+        [Sequelize.fn('DATE', Sequelize.col('purchaseDate')), 'date'],
+        [Sequelize.fn('SUM', Sequelize.col('total')), 'totalPurchase']
+      ],
+      where: {
+        purchaseDate: {
+          [Op.between]: [startDate, endDate],
+        },
+      },
+      group: [Sequelize.fn('DATE', Sequelize.col('purchaseDate'))],
+      order: [[Sequelize.fn('DATE', Sequelize.col('purchaseDate')), 'ASC']]
+    });
+    const dateRange = [];
+    for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+      dateRange.push(new Date(date));
+    }
+    const result = dateRange.map(date => {
+      const found = totalPurchasesByDay.find(purchase => new Date(purchase.dataValues.date).toDateString() === date.toDateString());
+      return {
+        date: date.toISOString().slice(0, 10),
+        totalPurchases: found ? found.dataValues.totalPurchase : 0
+      };
+    });
+
+    return {
+      errCode: 0,
+      errMessage: "OK",
+      data: result
+    };
+  } catch (error) {
+    console.error("Error fetching total purchases by day:", error);
+    return {
+      errCode: 1,
+      errMessage: "Error fetching total purchases by day",
+    };
+  }
+};
 
 module.exports = {
   createNewPurchase: createNewPurchase,
   createNewPurchaseDetail: createNewPurchaseDetail,
   getAllPurchase: getAllPurchase,
   EditPurchaseAndDetails: EditPurchaseAndDetails,
+  getTotalPurchasesByDay: getTotalPurchasesByDay
 };
