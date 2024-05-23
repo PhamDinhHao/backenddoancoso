@@ -46,7 +46,7 @@ let createNewSaleDetail = (data) => {
                 });
             }
 
-            // Cộng quantity của PurchaseDetail vào quantity của sản phẩm tìm được
+            // Cộng quantity của SaleDetail vào quantity của sản phẩm tìm được
             let newQuantity = product.quantity - data.quantity;
 
             // Cập nhật quantity mới trong bảng Product
@@ -112,6 +112,172 @@ const getTotalSalesByDay = async () => {
             errCode: 1,
             errMessage: "Error fetching total sales by day",
         };
+    }
+};
+let getAllSale = (SaleId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let Sales = "";
+
+            if (SaleId === "ALL" || !SaleId) {
+                Sales = db.Sale.findAll({
+                    attributes: {
+                        // exclude: ['password']
+                    },
+                    include: [
+                        {
+                            model: db.Customer,
+                            as: "Customer",
+                            attributes: ["id", "name"],
+                        },
+                    ],
+                    nest: true,
+                });
+            } else {
+                Sales = db.Sale.findOne({
+                    where: { id: SaleId },
+                    attributes: {
+                        // exclude: ['password']
+                    },
+                    include: [
+                        {
+                            model: db.Customer,
+                            as: "Customer",
+                            attributes: ["id", "name"],
+                        },
+                    ],
+                    nest: true,
+                });
+            }
+            resolve(Sales);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+let EditSaleAndDetails = async (Sale, SaleDetails) => {
+    try {
+        // Cập nhật thông tin Sale
+        await db.Sale.update(
+            {
+                customerIdId: Sale.customerIdId,
+                total: Sale.total,
+            },
+            { where: { id: Sale.saleId } }
+        );
+
+        // Lấy danh sách các chi tiết mua hàng hiện có
+        const existingDetails = await db.SaleDetail.findAll({
+            where: { SaleId: Sale.saleId },
+            raw: true,
+        });
+
+        const detailsToUpdate = [];
+        const detailsToCreate = [];
+        const detailsToDelete = [];
+
+        // Lưu trữ các chi tiết hiện có để kiểm tra
+        const existingDetailMap = existingDetails.reduce((map, detail) => {
+            map[detail.productId] = detail;
+            return map;
+        }, {});
+
+        // Phân loại các chi tiết sản phẩm để cập nhật hoặc thêm mới
+        for (let detail of SaleDetails) {
+            if (existingDetailMap[detail.productId]) {
+                // Chi tiết đã tồn tại, cần cập nhật
+                detailsToUpdate.push({
+                    ...detail,
+                    id: existingDetailMap[detail.productId].id, // Lấy id từ existingDetailMap
+                    oldQuantity: existingDetailMap[detail.productId].quantity, // Lưu lại quantity cũ để biết tăng hay giảm
+                });
+                // Xóa chi tiết này khỏi existingDetailMap để xác định những chi tiết còn lại để xóa
+                delete existingDetailMap[detail.productId];
+            } else {
+                // Chi tiết mới, cần thêm mới
+                detailsToCreate.push(detail);
+            }
+        }
+
+        // Các chi tiết còn lại trong existingDetailMap là những chi tiết cần xóa
+        for (let productId in existingDetailMap) {
+            detailsToDelete.push(existingDetailMap[productId]);
+        }
+
+        // Cập nhật các chi tiết mua hàng hiện có
+        for (let detail of detailsToUpdate) {
+            let product = await db.Product.findOne({
+                where: { id: detail.productId },
+            });
+            if (product) {
+                let quantityDiff = detail.quantity - detail.oldQuantity;
+                let newQuantity = product.quantity + quantityDiff;
+                await db.Product.update(
+                    { quantity: newQuantity },
+                    { where: { id: detail.productId } }
+                );
+            }
+
+            await db.SaleDetail.update(
+                {
+                    quantity: detail.quantity,
+                    costPrice: detail.costPrice,
+                    total: detail.total,
+                },
+                {
+                    where: { id: detail.id },
+                }
+            );
+        }
+
+        // Thêm các chi tiết mua hàng mới
+        for (let detail of detailsToCreate) {
+            let product = await db.Product.findOne({
+                where: { id: detail.productId },
+            });
+            if (product) {
+                let newQuantity = product.quantity + detail.quantity;
+                await db.Product.update(
+                    { quantity: newQuantity },
+                    { where: { id: detail.productId } }
+                );
+            }
+
+            await db.SaleDetail.create({
+                saleId: detail.saleId,
+                productId: detail.productId,
+                quantity: detail.quantity,
+                costPrice: detail.costPrice,
+                total: detail.total,
+            });
+        }
+
+        // Xóa các chi tiết mua hàng
+        for (let detail of detailsToDelete) {
+            let product = await db.Product.findOne({
+                where: { id: detail.productId },
+            });
+            if (product) {
+                let newQuantity = product.quantity - detail.quantity;
+                await db.Product.update(
+                    { quantity: newQuantity },
+                    { where: { id: detail.productId } }
+                );
+            }
+
+            await db.SaleDetail.destroy({
+                where: { id: detail.id },
+            });
+        }
+
+        return {
+            errCode: 0,
+            message: "Update successful",
+        };
+    } catch (error) {
+        console.error("Error in handleEditSaleAndDetails:", error);
+        throw error;
     }
 };
 const getCurrentMonth = () => {
@@ -180,5 +346,7 @@ module.exports = {
     createNewSale: createNewSale,
     createNewSaleDetail: createNewSaleDetail,
     getTotalSalesByDay: getTotalSalesByDay,
-    getTotalSalesByMonth: getTotalSalesByMonth
+    getTotalSalesByMonth: getTotalSalesByMonth,
+    EditSaleAndDetails: EditSaleAndDetails,
+    getAllSale: getAllSale
 };

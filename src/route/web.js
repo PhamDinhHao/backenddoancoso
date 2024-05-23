@@ -71,6 +71,10 @@ let initWebRoutes = (app) => {
     "/api/get-product-by-purchaseid",
     productController.handleGetProductsInPurchaseDetails
   );
+  router.get(
+    "/api/get-product-by-saleId",
+    productController.handleGetProductsInSaleDetails
+  );
 
   router.get("/api/allcode", userController.getAllCode);
 
@@ -101,10 +105,15 @@ let initWebRoutes = (app) => {
     "/api/create-new-sale-detail",
     saleController.handleCreateNewSaleDetail
   );
-
+  router.get("/api/get-all-sale", saleController.handleGetAllSale);
+  router.put(
+    "/api/edit-sale-and-details",
+    saleController.handleEditSaleAndDetails
+  );
   router.get("/api/total-sales-by-day", saleController.getTotalSalesByDay)
 
   router.get("/api/total-sales-by-mon", saleController.getTotalSalesByMonth)
+  router.get("/api/total-purchase-by-mon", purchaseController.getTotalPurchasesByMonth)
   router.get("/api/total-purchase-by-day", purchaseController.getTotalPurchasesByDay)
   return app.use("/", router);
 };

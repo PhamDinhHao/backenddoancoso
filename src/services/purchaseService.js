@@ -282,10 +282,68 @@ const getTotalPurchasesByDay = async () => {
   }
 };
 
+const getStartDateMon = () => {
+  const currentDate = new Date();
+  return new Date(currentDate.setMonth(currentDate.getMonth() - 10));
+};
+
+const getTotalPurchasesByMonth = async () => {
+  try {
+    const startDate = getStartDateMon();
+    const endDate = getCurrentMonth();
+
+    const totalSalesByMonth = await db.Purchase.findAll({
+      attributes: [
+        [Sequelize.fn('DATE_FORMAT', Sequelize.col('purchaseDate'), '%Y-%m'), 'month'],
+        [Sequelize.fn('SUM', Sequelize.col('total')), 'totalPurchase']
+      ],
+      where: {
+        saleDate: {
+          [Op.between]: [startDate, endDate],
+        },
+      },
+      group: [Sequelize.fn('DATE_FORMAT', Sequelize.col('purchaseDate'), '%Y-%m')],
+      order: [[Sequelize.fn('DATE_FORMAT', Sequelize.col('purchaseDate'), '%Y-%m'), 'ASC']]
+    });
+
+    // Create an array of all months within the last 12 months including current month
+    const dateRange = [];
+    const currentDate = new Date();
+    currentDate.setDate(1); // Set to the first day of the current month to ensure correct month calculation
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      dateRange.push(date);
+    }
+    dateRange.reverse();
+
+    // Fill in result array with each month's totalSales or 0 if not found
+    const result = dateRange.map(date => {
+      const monthString = date.toISOString().slice(0, 7); // Format as 'YYYY-MM'
+      const found = totalSalesByMonth.find(sale => sale.dataValues.month === monthString);
+      return {
+        month: monthString,
+        totalSales: found ? found.dataValues.totalSales : 0
+      };
+    });
+
+    return {
+      errCode: 0,
+      errMessage: "OK",
+      data: result
+    };
+  } catch (error) {
+    console.error("Error fetching total sales by month:", error);
+    return {
+      errCode: 1,
+      errMessage: "Error fetching total sales by month",
+    };
+  }
+};
 module.exports = {
   createNewPurchase: createNewPurchase,
   createNewPurchaseDetail: createNewPurchaseDetail,
   getAllPurchase: getAllPurchase,
   EditPurchaseAndDetails: EditPurchaseAndDetails,
-  getTotalPurchasesByDay: getTotalPurchasesByDay
+  getTotalPurchasesByDay: getTotalPurchasesByDay,
+  getTotalPurchasesByMonth: getTotalPurchasesByMonth
 };

@@ -235,7 +235,56 @@ let getProductsInPurchaseDetails = async (purchaseId) => {
     throw error;
   }
 };
+let getProductsInSaleDetails = async (saleId) => {
+  try {
+    // Lấy danh sách purchaseDetail dựa trên purchaseId
+    let saleDetails = await db.SaleDetail.findAll({
+      where: { saleId: saleId },
+      attributes: ["productId", "quantity", "total", "total"],
+      raw: true,
+    });
 
+    if (!saleDetails || saleDetails.length === 0) {
+      return {
+        errCode: 2,
+        errMessage: "No purchase details found",
+      };
+    }
+
+    // Lấy danh sách productId từ purchaseDetails
+    const productIds = saleDetails.map((detail) => detail.productId);
+
+    // Lấy thông tin chi tiết của các sản phẩm từ bảng products
+    let products = await db.Product.findAll({
+      where: {
+        id: productIds,
+      },
+      attributes: ["id", "productName"],
+      raw: true,
+    });
+
+    // Gán costPrice từ PurchaseDetail vào mỗi đối tượng sản phẩm trong products
+
+
+    // Kết hợp thông tin sản phẩm với purchaseDetails
+    let combinedResults = saleDetails.map((detail) => {
+      let product = products.find((product) => product.id === detail.productId);
+      return {
+        ...product,
+        quantity: detail.quantity,
+        total: detail.total,
+      };
+    });
+
+    return {
+      errCode: 0,
+      data: combinedResults,
+    };
+  } catch (error) {
+    console.log("Error in getProductsInPurchaseDetails:", error);
+    throw error;
+  }
+};
 module.exports = {
   getAllProducts: getAllProducts,
   createNewProduct: createNewProduct,
@@ -243,5 +292,6 @@ module.exports = {
   deleteProduct: deleteProduct,
   getProductSuggestions: getProductSuggestions,
   getProductsInPurchaseDetails: getProductsInPurchaseDetails,
-  handleGetProductDoneSale: handleGetProductDoneSale
+  handleGetProductDoneSale: handleGetProductDoneSale,
+  getProductsInSaleDetails: getProductsInSaleDetails
 };

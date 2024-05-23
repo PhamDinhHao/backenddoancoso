@@ -92,7 +92,31 @@ let handleGetProductsInPurchaseDetails = async (req, res) => {
     });
   }
 };
+let handleGetProductsInSaleDetails = async (req, res) => {
+  try {
+    let saleId = req.query.saleId;
+    if (!saleId) {
+      return res.status(400).json({
+        errCode: 1,
+        errMessage: "Missing required parameter: purchaseId",
+      });
+    }
 
+    let listProductBySaleId =
+      await productService.getProductsInSaleDetails(saleId);
+    return res.status(200).json({
+      errCode: 0,
+      errMessage: "OK",
+      data: listProductBySaleId,
+    });
+  } catch (error) {
+    console.log("Error in getProductsInPurchaseDetails:", error);
+    return res.status(500).json({
+      errCode: -1,
+      errMessage: "Error from the server",
+    });
+  }
+};
 module.exports = {
   handleGetAllProduct: handleGetAllProduct,
   handleCreateNewProduct: handleCreateNewProduct,
@@ -101,4 +125,5 @@ module.exports = {
   handleGetProductSuggestions: handleGetProductSuggestions,
   handleGetProductsInPurchaseDetails: handleGetProductsInPurchaseDetails,
   handleGetProductDoneSale: handleGetProductDoneSale,
+  handleGetProductsInSaleDetails: handleGetProductsInSaleDetails
 };

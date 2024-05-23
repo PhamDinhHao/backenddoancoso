@@ -63,11 +63,22 @@ let getTotalPurchasesByDay = async (req, res) => {
     });
   }
 };
-
+let getTotalPurchasesByMonth = async (req, res) => {
+  try {
+    const result = await purchaseService.getTotalPurchasesByMonth();
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({
+      errCode: 1,
+      errMessage: "Internal server error",
+    });
+  }
+};
 module.exports = {
   handleCreateNewPurchase: handleCreateNewPurchase,
   handleCreateNewPurchaseDetail: handleCreateNewPurchaseDetail,
   handleGetAllPurchase: handleGetAllPurchase,
   handleEditPurchaseAndDetails: handleEditPurchaseAndDetails,
-  getTotalPurchasesByDay: getTotalPurchasesByDay
+  getTotalPurchasesByDay: getTotalPurchasesByDay,
+  getTotalPurchasesByMonth: getTotalPurchasesByMonth
 };
