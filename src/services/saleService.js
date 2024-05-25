@@ -31,7 +31,7 @@ let createNewSaleDetail = (data) => {
                 productId: data.productId,
                 saleId: data.saleId,
                 quantity: data.quantity,
-
+                salePrice: data.salePrice,
                 total: data.total,
             });
             let product = await db.Product.findOne({

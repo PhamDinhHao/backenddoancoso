@@ -163,14 +163,13 @@ let updateProductData = (data) => {
 
 let getProductSuggestions = async (query) => {
   try {
-    console.log("Query value in service:", query);
     const suggestions = await db.Product.findAll({
       where: {
         productName: {
           [db.Sequelize.Op.like]: `%${query}%`, // Assuming 'name' is the field to search for suggestions
         },
       },
-      attributes: ["id", "productName", "costPrice"], // Include only necessary attributes
+      attributes: ["id", "productName", "costPrice", "salePrice"], // Include only necessary attributes
     });
     return suggestions;
   } catch (error) {
@@ -240,7 +239,7 @@ let getProductsInSaleDetails = async (saleId) => {
     // Lấy danh sách purchaseDetail dựa trên purchaseId
     let saleDetails = await db.SaleDetail.findAll({
       where: { saleId: saleId },
-      attributes: ["productId", "quantity", "total", "total"],
+      attributes: ["productId", "quantity", "total", "salePrice"],
       raw: true,
     });
 
@@ -259,7 +258,7 @@ let getProductsInSaleDetails = async (saleId) => {
       where: {
         id: productIds,
       },
-      attributes: ["id", "productName"],
+      attributes: ["id", "productName", "salePrice"],
       raw: true,
     });
 
