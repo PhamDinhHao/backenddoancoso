@@ -8,6 +8,8 @@ import categoryController from "../controllers/categoryController";
 import unitController from "../controllers/unitController";
 import purchaseController from "../controllers/purchaseController";
 import saleController from "../controllers/saleController";
+import sendOtpEmail from './sendEmail.js';
+import { create_confirm_otp, read_confirm_otp, deleteExpiredRecords, deleteExpiredRecordNow } from '../controllers/otp.js'
 let router = express.Router();
 
 let initWebRoutes = (app) => {
@@ -25,6 +27,8 @@ let initWebRoutes = (app) => {
   router.get("/api/get-all-users", userController.handleGetAllUsers);
   router.post("/api/create-new-user", userController.handleCreateNewUser);
   router.put("/api/edit-user", userController.handleEditUser);
+  router.put("/api/edit-user-password", userController.updatePasswordUserData);
+  router.post("/api/check-email", userController.checkUserEmail);
   router.delete("/api/delete-user", userController.handleDeleteUser);
 
   router.get("/api/get-all-supplier", supplierController.handleGetAllSupplier);
@@ -115,6 +119,41 @@ let initWebRoutes = (app) => {
   router.get("/api/total-sales-by-mon", saleController.getTotalSalesByMonth)
   router.get("/api/total-purchase-by-mon", purchaseController.getTotalPurchasesByMonth)
   router.get("/api/total-purchase-by-day", purchaseController.getTotalPurchasesByDay)
+  router.post('/verify-otp', async (req, res) => {
+    try {
+
+      const { email, otp } = req.body;
+      const result = await read_confirm_otp(email, otp);
+      if (result.success === true) {
+        await deleteExpiredRecordNow(email)
+        res.status(200).json({ success: result.success, message: result.message });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message || 'Internal Server Error' });
+    }
+  });
+  router.post('/send-otp-email', async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      const otp = Math.floor(100000 + Math.random() * 900000);
+      const result = await create_confirm_otp(email, otp.toString());
+      const emailSent = await sendOtpEmail(email, otp.toString());
+      if (emailSent) {
+        let timeout;
+        timeout = setTimeout(() => {
+          deleteExpiredRecords(email);
+          clearTimeout(timeout);
+        }, 1 * 6000);
+      }
+      if (!emailSent) {
+        throw new Error('Failed to send OTP email.');
+      }
+      res.status(200).json({ message: result.message });
+    } catch (error) {
+      res.status(500).json({ message: error.message || 'Internal Server Error' });
+    }
+  });
   return app.use("/", router);
 };
 module.exports = initWebRoutes;
