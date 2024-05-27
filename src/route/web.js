@@ -8,6 +8,7 @@ import categoryController from "../controllers/categoryController";
 import unitController from "../controllers/unitController";
 import purchaseController from "../controllers/purchaseController";
 import saleController from "../controllers/saleController";
+import reportController from "../controllers/reportController";
 let router = express.Router();
 
 let initWebRoutes = (app) => {
@@ -52,7 +53,10 @@ let initWebRoutes = (app) => {
     "/api/delete-customer",
     customerController.handleDeleteCustomer
   );
-  router.get('/api/get-customer-suggestion', customerController.handleGetCustomerSuggestions);
+  router.get(
+    "/api/get-customer-suggestion",
+    customerController.handleGetCustomerSuggestions
+  );
 
   router.get("/api/get-all-product", productController.handleGetAllProduct);
   router.post(
@@ -60,7 +64,10 @@ let initWebRoutes = (app) => {
     productController.handleCreateNewProduct
   );
 
-  router.get("/api/get-product-done-sale", productController.handleGetProductDoneSale);
+  router.get(
+    "/api/get-product-done-sale",
+    productController.handleGetProductDoneSale
+  );
   router.put("/api/edit-product", productController.handleEditProduct);
   router.delete("/api/delete-product", productController.handleDeleteProduct);
   router.get(
@@ -100,6 +107,7 @@ let initWebRoutes = (app) => {
 
   router.get("/api/get-all-unit", unitController.handleGetAllUnit);
   router.post("/api/create-new-unit", unitController.handleCreateNewUnit);
+
   router.post("/api/create-new-sale", saleController.handleCreateNewSale);
   router.post(
     "/api/create-new-sale-detail",
@@ -110,11 +118,25 @@ let initWebRoutes = (app) => {
     "/api/edit-sale-and-details",
     saleController.handleEditSaleAndDetails
   );
-  router.get("/api/total-sales-by-day", saleController.getTotalSalesByDay)
+  router.get("/api/total-sales-by-day", saleController.getTotalSalesByDay);
+  router.get("/api/total-sales-by-mon", saleController.getTotalSalesByMonth);
+  router.get(
+    "/api/total-purchase-by-mon",
+    purchaseController.getTotalPurchasesByMonth
+  );
+  router.get(
+    "/api/total-purchase-by-day",
+    purchaseController.getTotalPurchasesByDay
+  );
 
-  router.get("/api/total-sales-by-mon", saleController.getTotalSalesByMonth)
-  router.get("/api/total-purchase-by-mon", purchaseController.getTotalPurchasesByMonth)
-  router.get("/api/total-purchase-by-day", purchaseController.getTotalPurchasesByDay)
+  router.get(
+    "/api/top-10-sale-product-revenue",
+    reportController.getTop10SaleProductRevenue
+  );
+  router.get(
+    "/api/top-10-sale-product-quantity",
+    reportController.getTop10SaleProductQuantity
+  );
   return app.use("/", router);
 };
 module.exports = initWebRoutes;
