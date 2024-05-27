@@ -137,6 +137,14 @@ let initWebRoutes = (app) => {
     "/api/top-10-sale-product-quantity",
     reportController.getTop10SaleProductQuantity
   );
+  router.get(
+    "/api/top-10-customer-revenue",
+    reportController.getTop10CustomerRevenue
+  );
+  router.get(
+    "/api/top-10-supplier-revenue",
+    reportController.getTop10SupplierRevenue
+  );
   return app.use("/", router);
 };
 module.exports = initWebRoutes;
