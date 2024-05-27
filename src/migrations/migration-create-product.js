@@ -12,6 +12,7 @@ module.exports = {
       // supplierId: DataTypes.INTEGER,
       // unitId: DataTypes.INTEGER,
       // categoryId: DataTypes.INTEGER,
+      //locationId: DataTypes.INTEGER,
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -46,6 +47,9 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       waitTime: {
+        type: Sequelize.INTEGER,
+      },
+      locationId: {
         type: Sequelize.INTEGER,
       },
 
