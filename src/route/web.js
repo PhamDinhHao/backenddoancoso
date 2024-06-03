@@ -5,6 +5,7 @@ import supplierController from "../controllers/supplierController";
 import customerController from "../controllers/customerController";
 import productController from "../controllers/productController";
 import categoryController from "../controllers/categoryController";
+import locationController from "../controllers/locationController";
 import unitController from "../controllers/unitController";
 import purchaseController from "../controllers/purchaseController";
 import saleController from "../controllers/saleController";
@@ -93,6 +94,11 @@ let initWebRoutes = (app) => {
   router.post(
     "/api/create-new-category",
     categoryController.handleCreateNewCategory
+  );
+  router.get("/api/get-all-location", locationController.handleGetAlllacation);
+  router.post(
+    "/api/create-new-location",
+    locationController.handleCreateNewlacation
   );
 
   router.post(

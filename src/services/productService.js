@@ -26,6 +26,11 @@ let getAllProducts = (productId) => {
               as: "Unit",
               attributes: ["id", "unitName"],
             },
+            {
+              model: db.Location,
+              as: "Location",
+              attributes: ["id", "locationName"],
+            }
           ],
           nest: true,
         });
@@ -70,6 +75,7 @@ let createNewProduct = (data) => {
       await db.Product.create({
         productName: data.productName,
         categoryId: data.selectedCategory.value,
+        locationId: data.selectedLocation.value,
         supplierId: data.selectedSupplier.value,
         unitId: data.selectedUnit.value,
         image: data.image,

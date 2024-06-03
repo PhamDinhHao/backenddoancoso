@@ -46,19 +46,49 @@ let createNewSaleDetail = (data) => {
                 });
             }
 
-            // Cộng quantity của SaleDetail vào quantity của sản phẩm tìm được
+            //tru  quantity của SaleDetail vào quantity của sản phẩm tìm được
             let newQuantity = product.quantity - data.quantity;
+            if (newQuantity >= 0) {
+                await db.Product.update(
+                    { quantity: newQuantity },
+                    { where: { id: data.productId } }
+                );
+                resolve({
+                    errCode: 0,
+                    errMessage: "Sale detail created successfully",
+                    newSaleDetail: newSaleDetail.toJSON(),
+                });
+            }
+            else {
+                let sale = await db.Sale.findOne({
+                    where: { id: data.saleId },
+                    raw: false
+
+                })
+                if (!sale) {
+                    resolve({
+                        errCode: 2,
+                        errMessage: `The sale isn't exist`
+                    });
+
+                }
+                else {
+                    await sale.destroy();
+
+                    // await db.supplier.destroy({
+                    //     where: { id: supplierId },
+                    // })
+
+
+                    resolve({
+                        errCode: 3,
+                        errMessage: `The sale is delete`
+                    });
+                }
+            }
 
             // Cập nhật quantity mới trong bảng Product
-            await db.Product.update(
-                { quantity: newQuantity },
-                { where: { id: data.productId } }
-            );
-            resolve({
-                errCode: 0,
-                errMessage: "Sale detail created successfully",
-                newSaleDetail: newSaleDetail.toJSON(),
-            });
+
         } catch (error) {
             reject(error);
         }
