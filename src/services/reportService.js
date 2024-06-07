@@ -141,10 +141,12 @@ const getTop10CustomersByRevenue = async (
         {
           model: db.Sale,
           attributes: ["customerId"],
+          required: true, // Ensure only Sales with a customerId are included
           include: [
             {
               model: db.Customer,
               attributes: ["name"],
+              required: true, // Ensure only Sales with a Customer are included
             },
           ],
         },
@@ -156,19 +158,11 @@ const getTop10CustomersByRevenue = async (
 
     return result.map((saleDetail) => {
       const customer = saleDetail.Sale.Customer;
-      if (customer) {
-        return {
-          customerId: saleDetail.Sale.customerId,
-          customerName: customer.name,
-          totalRevenue: saleDetail.dataValues.totalRevenue,
-        };
-      } else {
-        return {
-          customerId: saleDetail.Sale.customerId,
-          customerName: "Unknown",
-          totalRevenue: saleDetail.dataValues.totalRevenue,
-        };
-      }
+      return {
+        customerId: saleDetail.Sale.customerId,
+        customerName: customer ? customer.name : "Unknown",
+        totalRevenue: saleDetail.dataValues.totalRevenue,
+      };
     });
   } catch (error) {
     console.error("Error fetching top customers by revenue:", error);
@@ -211,13 +205,14 @@ const getTop10SuppliersByRevenue = async (
           model: db.Supplier,
           as: "Supplier",
           attributes: ["name"],
+          required: true, // Ensure only Purchases with a Supplier are included
         },
       ],
     });
 
     return result.map((purchase) => ({
       supplierId: purchase.supplierId,
-      supplierName: purchase.Supplier.name,
+      supplierName: purchase.Supplier ? purchase.Supplier.name : "Unknown",
       totalQuantity: purchase.dataValues.totalRevenue,
     }));
   } catch (error) {
