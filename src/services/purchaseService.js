@@ -2,6 +2,7 @@ import { request } from "express";
 import db from "../models/index";
 import { where } from "sequelize";
 import { Op, Sequelize } from "sequelize";
+
 let createNewPurchase = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -233,6 +234,7 @@ let EditPurchaseAndDetails = async (purchase, purchaseDetails) => {
     throw error;
   }
 };
+
 const getStartDate = () => {
   const currentDate = new Date();
   return new Date(currentDate.setDate(currentDate.getDate() - 7));
@@ -245,33 +247,41 @@ const getTotalPurchasesByDay = async () => {
 
     const totalPurchasesByDay = await db.Purchase.findAll({
       attributes: [
-        [Sequelize.fn('DATE', Sequelize.col('purchaseDate')), 'date'],
-        [Sequelize.fn('SUM', Sequelize.col('total')), 'totalPurchase']
+        [Sequelize.fn("DATE", Sequelize.col("purchaseDate")), "date"],
+        [Sequelize.fn("SUM", Sequelize.col("total")), "totalPurchase"],
       ],
       where: {
         purchaseDate: {
           [Op.between]: [startDate, endDate],
         },
       },
-      group: [Sequelize.fn('DATE', Sequelize.col('purchaseDate'))],
-      order: [[Sequelize.fn('DATE', Sequelize.col('purchaseDate')), 'ASC']]
+      group: [Sequelize.fn("DATE", Sequelize.col("purchaseDate"))],
+      order: [[Sequelize.fn("DATE", Sequelize.col("purchaseDate")), "ASC"]],
     });
     const dateRange = [];
-    for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+    for (
+      let date = new Date(startDate);
+      date <= endDate;
+      date.setDate(date.getDate() + 1)
+    ) {
       dateRange.push(new Date(date));
     }
-    const result = dateRange.map(date => {
-      const found = totalPurchasesByDay.find(purchase => new Date(purchase.dataValues.date).toDateString() === date.toDateString());
+    const result = dateRange.map((date) => {
+      const found = totalPurchasesByDay.find(
+        (purchase) =>
+          new Date(purchase.dataValues.date).toDateString() ===
+          date.toDateString()
+      );
       return {
         date: date.toISOString().slice(0, 10),
-        totalPurchases: found ? found.dataValues.totalPurchase : 0
+        totalPurchases: found ? found.dataValues.totalPurchase : 0,
       };
     });
 
     return {
       errCode: 0,
       errMessage: "OK",
-      data: result
+      data: result,
     };
   } catch (error) {
     console.error("Error fetching total purchases by day:", error);
@@ -294,16 +304,26 @@ const getTotalPurchasesByMonth = async () => {
 
     const totalSalesByMonth = await db.Purchase.findAll({
       attributes: [
-        [Sequelize.fn('DATE_FORMAT', Sequelize.col('purchaseDate'), '%Y-%m'), 'month'],
-        [Sequelize.fn('SUM', Sequelize.col('total')), 'totalPurchase']
+        [
+          Sequelize.fn("DATE_FORMAT", Sequelize.col("purchaseDate"), "%Y-%m"),
+          "month",
+        ],
+        [Sequelize.fn("SUM", Sequelize.col("total")), "totalPurchase"],
       ],
       where: {
         saleDate: {
           [Op.between]: [startDate, endDate],
         },
       },
-      group: [Sequelize.fn('DATE_FORMAT', Sequelize.col('purchaseDate'), '%Y-%m')],
-      order: [[Sequelize.fn('DATE_FORMAT', Sequelize.col('purchaseDate'), '%Y-%m'), 'ASC']]
+      group: [
+        Sequelize.fn("DATE_FORMAT", Sequelize.col("purchaseDate"), "%Y-%m"),
+      ],
+      order: [
+        [
+          Sequelize.fn("DATE_FORMAT", Sequelize.col("purchaseDate"), "%Y-%m"),
+          "ASC",
+        ],
+      ],
     });
 
     // Create an array of all months within the last 12 months including current month
@@ -311,25 +331,31 @@ const getTotalPurchasesByMonth = async () => {
     const currentDate = new Date();
     currentDate.setDate(1); // Set to the first day of the current month to ensure correct month calculation
     for (let i = 0; i < 12; i++) {
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const date = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() - i,
+        1
+      );
       dateRange.push(date);
     }
     dateRange.reverse();
 
     // Fill in result array with each month's totalSales or 0 if not found
-    const result = dateRange.map(date => {
+    const result = dateRange.map((date) => {
       const monthString = date.toISOString().slice(0, 7); // Format as 'YYYY-MM'
-      const found = totalSalesByMonth.find(sale => sale.dataValues.month === monthString);
+      const found = totalSalesByMonth.find(
+        (sale) => sale.dataValues.month === monthString
+      );
       return {
         month: monthString,
-        totalSales: found ? found.dataValues.totalSales : 0
+        totalSales: found ? found.dataValues.totalSales : 0,
       };
     });
 
     return {
       errCode: 0,
       errMessage: "OK",
-      data: result
+      data: result,
     };
   } catch (error) {
     console.error("Error fetching total sales by month:", error);
@@ -345,5 +371,5 @@ module.exports = {
   getAllPurchase: getAllPurchase,
   EditPurchaseAndDetails: EditPurchaseAndDetails,
   getTotalPurchasesByDay: getTotalPurchasesByDay,
-  getTotalPurchasesByMonth: getTotalPurchasesByMonth
+  getTotalPurchasesByMonth: getTotalPurchasesByMonth,
 };
