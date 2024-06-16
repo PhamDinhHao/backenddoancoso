@@ -293,11 +293,14 @@ const getTotalPurchasesByDay = async () => {
 };
 const getCurrentMonth = () => {
   const currentDate = new Date();
-  return new Date(currentDate.setMonth(currentDate.getMonth() + 2)); // Trả về tháng hiện tại, bắt đầu từ 1 (tháng 1) đến 12 (tháng 12)
+  currentDate.setMonth(currentDate.getMonth() + 1); // Corrected to get the current month
+  return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
 };
+
 const getStartDateMon = () => {
   const currentDate = new Date();
-  return new Date(currentDate.setMonth(currentDate.getMonth() - 10));
+  currentDate.setMonth(currentDate.getMonth() - 11); // Corrected to get the starting month 11 months back
+  return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
 };
 
 const getTotalPurchasesByMonth = async () => {
@@ -307,11 +310,8 @@ const getTotalPurchasesByMonth = async () => {
 
     const totalSalesByMonth = await db.Purchase.findAll({
       attributes: [
-        [
-          Sequelize.fn("DATE_FORMAT", Sequelize.col("purchaseDate"), "%Y-%m"),
-          "month",
-        ],
-        [Sequelize.fn("SUM", Sequelize.col("total")), "totalPurchase"],
+        [Sequelize.fn('DATE_FORMAT', Sequelize.col('purchaseDate'), '%Y-%m'), 'month'],
+        [Sequelize.fn('SUM', Sequelize.col('total')), 'totalPurchase']
       ],
       where: {
         purchaseDate: {
@@ -329,7 +329,6 @@ const getTotalPurchasesByMonth = async () => {
       ],
     });
 
-    // Create an array of all months within the last 12 months including current month
     const dateRange = [];
     const currentDate = new Date();
     currentDate.setDate(1); // Set to the first day of the current month to ensure correct month calculation
@@ -343,7 +342,6 @@ const getTotalPurchasesByMonth = async () => {
     }
     dateRange.reverse();
 
-    // Fill in result array with each month's totalSales or 0 if not found
     const result = dateRange.map((date) => {
       const monthString = date.toISOString().slice(0, 7); // Format as 'YYYY-MM'
       const found = totalSalesByMonth.find(
@@ -351,7 +349,7 @@ const getTotalPurchasesByMonth = async () => {
       );
       return {
         month: monthString,
-        totalSales: found ? found.dataValues.totalSales : 0,
+        totalPurchases: found ? found.dataValues.totalPurchase : 0, // Corrected 'totalPurchase'
       };
     });
 
