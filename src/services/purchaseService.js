@@ -281,7 +281,10 @@ const getTotalPurchasesByDay = async () => {
     };
   }
 };
-
+const getCurrentMonth = () => {
+  const currentDate = new Date();
+  return new Date(currentDate.setMonth(currentDate.getMonth() + 2)); // Trả về tháng hiện tại, bắt đầu từ 1 (tháng 1) đến 12 (tháng 12)
+};
 const getStartDateMon = () => {
   const currentDate = new Date();
   return new Date(currentDate.setMonth(currentDate.getMonth() - 10));
@@ -298,7 +301,7 @@ const getTotalPurchasesByMonth = async () => {
         [Sequelize.fn('SUM', Sequelize.col('total')), 'totalPurchase']
       ],
       where: {
-        saleDate: {
+        purchaseDate: {
           [Op.between]: [startDate, endDate],
         },
       },
