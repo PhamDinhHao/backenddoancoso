@@ -1,6 +1,6 @@
 import { request } from "express";
 import db from "../models/index";
-const { Op } = require('sequelize');
+const { Op } = require("sequelize");
 let getAllProducts = (productId) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -30,7 +30,7 @@ let getAllProducts = (productId) => {
               model: db.Location,
               as: "Location",
               attributes: ["id", "locationName"],
-            }
+            },
           ],
           nest: true,
         });
@@ -55,11 +55,14 @@ const handleGetProductDoneSale = () => {
     try {
       const soldProducts = await db.SaleDetail.findAll({
         attributes: [
-          'productId',
-          [db.sequelize.fn('SUM', db.sequelize.col('quantity')), 'totalQuantity'],
+          "productId",
+          [
+            db.sequelize.fn("SUM", db.sequelize.col("quantity")),
+            "totalQuantity",
+          ],
         ],
 
-        group: ['SaleDetail.productId'],
+        group: ["SaleDetail.productId"],
       });
       resolve(soldProducts);
     } catch (error) {
@@ -67,7 +70,6 @@ const handleGetProductDoneSale = () => {
     }
   });
 };
-
 
 let createNewProduct = (data) => {
   return new Promise(async (resolve, reject) => {
@@ -175,7 +177,7 @@ let getProductSuggestions = async (query) => {
           [db.Sequelize.Op.like]: `%${query}%`, // Assuming 'name' is the field to search for suggestions
         },
       },
-      attributes: ["id", "productName", "costPrice", "salePrice"], // Include only necessary attributes
+      attributes: ["id", "productName", "quantity", "costPrice", "salePrice"], // Include only necessary attributes
     });
     return suggestions;
   } catch (error) {
@@ -270,7 +272,6 @@ let getProductsInSaleDetails = async (saleId) => {
 
     // Gán costPrice từ PurchaseDetail vào mỗi đối tượng sản phẩm trong products
 
-
     // Kết hợp thông tin sản phẩm với purchaseDetails
     let combinedResults = saleDetails.map((detail) => {
       let product = products.find((product) => product.id === detail.productId);
@@ -298,5 +299,5 @@ module.exports = {
   getProductSuggestions: getProductSuggestions,
   getProductsInPurchaseDetails: getProductsInPurchaseDetails,
   handleGetProductDoneSale: handleGetProductDoneSale,
-  getProductsInSaleDetails: getProductsInSaleDetails
+  getProductsInSaleDetails: getProductsInSaleDetails,
 };

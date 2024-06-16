@@ -9,8 +9,14 @@ import locationController from "../controllers/locationController";
 import unitController from "../controllers/unitController";
 import purchaseController from "../controllers/purchaseController";
 import saleController from "../controllers/saleController";
-import sendOtpEmail from './sendEmail.js';
-import { create_confirm_otp, read_confirm_otp, deleteExpiredRecords, deleteExpiredRecordNow } from '../controllers/otp.js'
+import sendOtpEmail from "./sendEmail.js";
+import stockController from "../controllers/stockController.js";
+import {
+  create_confirm_otp,
+  read_confirm_otp,
+  deleteExpiredRecords,
+  deleteExpiredRecordNow,
+} from "../controllers/otp.js";
 import reportController from "../controllers/reportController";
 let router = express.Router();
 
@@ -128,25 +134,34 @@ let initWebRoutes = (app) => {
     "/api/edit-sale-and-details",
     saleController.handleEditSaleAndDetails
   );
-  router.get("/api/total-sales-by-day", saleController.getTotalSalesByDay)
+  router.get("/api/total-sales-by-day", saleController.getTotalSalesByDay);
 
-  router.get("/api/total-sales-by-mon", saleController.getTotalSalesByMonth)
-  router.get("/api/total-purchase-by-mon", purchaseController.getTotalPurchasesByMonth)
-  router.get("/api/total-purchase-by-day", purchaseController.getTotalPurchasesByDay)
-  router.post('/verify-otp', async (req, res) => {
+  router.get("/api/total-sales-by-mon", saleController.getTotalSalesByMonth);
+  router.get(
+    "/api/total-purchase-by-mon",
+    purchaseController.getTotalPurchasesByMonth
+  );
+  router.get(
+    "/api/total-purchase-by-day",
+    purchaseController.getTotalPurchasesByDay
+  );
+  router.post("/verify-otp", async (req, res) => {
     try {
-
       const { email, otp } = req.body;
       const result = await read_confirm_otp(email, otp);
       if (result.success === true) {
-        await deleteExpiredRecordNow(email)
-        res.status(200).json({ success: result.success, message: result.message });
+        await deleteExpiredRecordNow(email);
+        res
+          .status(200)
+          .json({ success: result.success, message: result.message });
       }
     } catch (error) {
-      res.status(500).json({ message: error.message || 'Internal Server Error' });
+      res
+        .status(500)
+        .json({ message: error.message || "Internal Server Error" });
     }
   });
-  router.post('/send-otp-email', async (req, res) => {
+  router.post("/send-otp-email", async (req, res) => {
     try {
       const { email } = req.body;
 
@@ -161,11 +176,13 @@ let initWebRoutes = (app) => {
         }, 1 * 6000);
       }
       if (!emailSent) {
-        throw new Error('Failed to send OTP email.');
+        throw new Error("Failed to send OTP email.");
       }
       res.status(200).json({ message: result.message });
     } catch (error) {
-      res.status(500).json({ message: error.message || 'Internal Server Error' });
+      res
+        .status(500)
+        .json({ message: error.message || "Internal Server Error" });
     }
   });
   router.get("/api/total-sales-by-day", saleController.getTotalSalesByDay);
@@ -195,6 +212,16 @@ let initWebRoutes = (app) => {
     "/api/top-10-supplier-revenue",
     reportController.getTop10SupplierRevenue
   );
+
+  router.post(
+    "/api/create-new-stock-check",
+    stockController.createNewStockCheck
+  );
+  router.post(
+    "/api/create-new-stock-check-detail",
+    stockController.createNewStockCheckDetail
+  );
+  router.get("/api/get-all-stock-check", stockController.getAllStockChecks);
   return app.use("/", router);
 };
 module.exports = initWebRoutes;
