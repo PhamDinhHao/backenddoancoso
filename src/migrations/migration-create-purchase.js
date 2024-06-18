@@ -6,6 +6,8 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable("Purchases", {
       // purchaseDate: DataTypes.DATE,
+      // supplierId: DataTypes.INTEGER,
+      // total: DataTypes.INTEGER,
 
       id: {
         allowNull: false,
@@ -15,6 +17,12 @@ module.exports = {
       },
       purchaseDate: {
         type: Sequelize.DATE,
+      },
+      supplierId: {
+        type: Sequelize.INTEGER,
+      },
+      total: {
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         allowNull: false,

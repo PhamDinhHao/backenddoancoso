@@ -8,9 +8,19 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Product.belongsTo(models.Supplier, { foreignKey: "supplierId", as: "Supplier" });
+      Product.belongsTo(models.Supplier, {
+        foreignKey: "supplierId",
+        as: "Supplier",
+      });
       Product.belongsTo(models.Unit, { foreignKey: "unitId", as: "Unit" });
-      Product.belongsTo(models.Category, { foreignKey: "categoryId", as: "Category" });
+      Product.belongsTo(models.Category, {
+        foreignKey: "categoryId",
+        as: "Category",
+      });
+      Product.belongsTo(models.Location, {
+        foreignKey: "locationId",
+        as: "Location",
+      });
       Product.belongsToMany(models.PurchaseDetail, {
         through: "ProductPurchaseDetail",
         foreignKey: "productId",
@@ -18,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
       Product.belongsToMany(models.SaleDetail, {
         through: "ProductSaleDetail",
         foreignKey: "productId",
+      });
+      Product.hasMany(models.StockCheckDetail, {
+        foreignKey: "productId",
+        as: "stockCheckDetails",
       });
     }
   }
@@ -32,6 +46,8 @@ module.exports = (sequelize, DataTypes) => {
       categoryId: DataTypes.INTEGER,
       costPrice: DataTypes.INTEGER,
       salePrice: DataTypes.INTEGER,
+      waitTime: DataTypes.INTEGER,
+      locationId: DataTypes.INTEGER,
     },
     {
       sequelize,

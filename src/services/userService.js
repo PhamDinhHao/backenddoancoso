@@ -220,6 +220,35 @@ let updateUserData = (data) => {
         }
     })
 }
+let updatePasswordUserData = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let user = await db.User.findOne({
+                where: { email: data.email },
+                raw: false
+            })
+            let hashPasswordFromBrypt = await hashUserPassword(data.password);
+            if (user) {
+
+                user.password = hashPasswordFromBrypt,
+                    await user.save();
+
+                resolve({
+                    errCode: 0,
+                    errMessage: 'Update the user succeeds'
+                });
+            }
+            else {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'User not found'
+                });
+            }
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
 // let getAllCodeService = (typeInput) => {
 //     return new Promise(async (resolve, reject) => {
 //         try {
@@ -249,5 +278,7 @@ module.exports = {
     createNewUser: createNewUser,
     deleteUser: deleteUser,
     updateUserData: updateUserData,
+    updatePasswordUserData: updatePasswordUserData,
+    checkUserEmail: checkUserEmail,
     // getAllCodeService: getAllCodeService,
 }

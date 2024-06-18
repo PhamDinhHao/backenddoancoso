@@ -4,9 +4,10 @@ const { sequelize } = require("../models");
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("Sales", {
-      // customerId: DataTypes.INTEGER,
-      // saleDate: DataTypes.DATE,
+    await queryInterface.createTable("locations", {
+      // locationName: DataTypes.STRING,
+      // maxWeightCapacity: DataTypes.FLOAT,
+      // currentWeight: DataTypes.FLOAT,
 
       id: {
         allowNull: false,
@@ -14,14 +15,14 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      customerId: {
-        type: Sequelize.INTEGER,
+      locationName: {
+        type: Sequelize.STRING,
       },
-      saleDate: {
-        type: Sequelize.DATE,
+      maxWeightCapacity: {
+        type: Sequelize.FLOAT,
       },
-      total: {
-        type: Sequelize.INTEGER,
+      currentWeight: {
+        type: Sequelize.FLOAT,
       },
       createdAt: {
         allowNull: false,
@@ -34,6 +35,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("Sales");
+    await queryInterface.dropTable("locations");
   },
 };

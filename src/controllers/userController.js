@@ -66,6 +66,23 @@ let getAllCode = async (req, res) => {
         })
     }
 }
+let updatePasswordUserData = async (req, res) => {
+    let data = req.body;
+    let message = await userService.updatePasswordUserData(data);
+    return res.status(200).json(message);
+
+}
+let checkUserEmail = async (req, res) => {
+    let { email } = req.body;
+    let emailExists = await userService.checkUserEmail(email);
+
+    if (emailExists) {
+        return res.status(200).json({ errCode: 0, message: "Email exists" });
+    } else {
+        return res.status(200).json({ errCode: 1, message: "Email does not exist" });
+    }
+
+}
 module.exports = {
     handleLogin: handleLogin,
     handleGetAllUsers: handleGetAllUsers,
@@ -73,4 +90,6 @@ module.exports = {
     handleEditUser: handleEditUser,
     handleDeleteUser: handleDeleteUser,
     getAllCode: getAllCode,
+    updatePasswordUserData: updatePasswordUserData,
+    checkUserEmail: checkUserEmail,
 }

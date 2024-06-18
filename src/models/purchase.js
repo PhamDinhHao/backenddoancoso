@@ -9,11 +9,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Purchase.hasMany(models.PurchaseDetail, { foreignKey: "purchaseId" });
+      Purchase.belongsTo(models.Supplier, { foreignKey: "supplierId", as: "Supplier" });
     }
   }
   Purchase.init(
     {
       purchaseDate: DataTypes.DATE,
+      supplierId: DataTypes.INTEGER,
+      total: DataTypes.INTEGER,
     },
     {
       sequelize,

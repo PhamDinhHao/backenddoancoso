@@ -128,11 +128,29 @@ let updateCustomerData = (data) => {
         }
     })
 }
+let getCustomerSuggestions = async (query) => {
+    try {
+
+        const suggestions = await db.Customer.findAll({
+            where: {
+                name: {
+                    [db.Sequelize.Op.like]: `%${query}%`, // Assuming 'name' is the field to search for suggestions
+                },
+            },
+            attributes: ["id", "name"], // Include only necessary attributes
+            limit: 10,
+        });
+        return suggestions;
+    } catch (error) {
+        throw error;
+    }
+};
 module.exports = {
     getAllCustomers: getAllCustomers,
     createNewCustomer: createNewCustomer,
     deleteCustomer: deleteCustomer,
-    updateCustomerData: updateCustomerData
+    updateCustomerData: updateCustomerData,
+    getCustomerSuggestions: getCustomerSuggestions
 
 
 
